@@ -1,4 +1,5 @@
 import { Database } from "bun:sqlite";
+import * as crawler from "./crawler/crawler.ts"
 
 const db = new Database("./database/wormindex.db");
 const portNumber = 3000;
@@ -40,3 +41,8 @@ Bun.serve({
 })
 
 console.log(`Listening on port ${portNumber}.`)
+
+let ao3Crawler = new crawler.crawlerAo3(db);
+
+await ao3Crawler.fetchSite();
+ao3Crawler.formatPage();
