@@ -67,28 +67,33 @@ public formatPage(): void {
 
 handleAo3Fandoms($: cheerio.CheerioAPI, selector: string) {
     let elements = $(selector);
-        console.log(elements.toArray())
 
-    let fandoms: string[];
+
+    let fandoms: (string | null)[] = [];
     
     if (elements === undefined) {
         console.log("Something went wrong when parsing Ao3 fandoms")
         return null;
     }
 
-    console.log("AAAAAAA")
-
-    elements.children().first().remove()
-    
-    let i = 0;
     
 
-    for (const element of elements.toArray())  {
+    for (let fandomBox of elements.toArray()) {
+        $(fandomBox).children().first().remove();
+        const filtered = $(fandomBox).children().filter((_, el) => $(el).text() !== "Parahumans Series - Wildbow").toArray();
 
-        let fandoms = $(element).children().map((_, el) => $(el).text().trim()).get().filter((elString) => elString !== "Parahumans Series - Wildbow" )
+        if ($(filtered).toArray().length === 0)
+            fandoms.push(null);
+        else
+            if ($(filtered).toArray()[0] !== undefined)
+                fandoms.push($($(filtered).toArray()[0]).text());
 
-        fandoms.push(fandoms[0]!);
+
     }
+
+    console.log(fandoms.length)
+    
+
 
 
 
@@ -107,7 +112,7 @@ parsePage() {
 }
 
 cheerioElementData($: cheerio.CheerioAPI, selector: string) {
-    return $(selector).map((_, el) => $(el).text().trim()).get();
+    return $(selector).map((_, el) => $(el).text()).get();
 }
 
 }
