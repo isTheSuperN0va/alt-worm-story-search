@@ -1,6 +1,7 @@
 import * as cheerio from 'cheerio'
 import { Element } from "domhandler";
 import { Database } from 'bun:sqlite'
+import * as Logging from '../logger'
 
 const ao3Url: string = "https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works";
 
@@ -35,7 +36,7 @@ export class crawler {
         const res = await fetch ("https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works");
         
         this.dataCurrent = await res.text();
-        console.log("Fetched ao3 data")
+        Logging.info(Logging.LogSource.Http, "Fetched AO3 page")
     }
 
 }
@@ -72,7 +73,7 @@ public formatPage(): void {
 
 
     if (!title || !author) {
-        console.log("error: missing required story data");
+        Logging.error(Logging.LogSource.Parser, "Missing required story data")
     }
 
     insert.run
@@ -84,6 +85,9 @@ public formatPage(): void {
         $updated[0] ?? " ",
         $fandoms[0] ?? null
     );
+
+    Logging.info(Logging.LogSource.Database, "Inserted 20 stories of page 0");
+    // lotta work to do here, also refactor?
 
 }
 
@@ -129,7 +133,7 @@ parsePage() {
 
 cheerioElementData($: cheerio.CheerioAPI, selector: string, label: string) {
     for (const data of $(selector)) {
-        console.log(`got ${label}: ${$(data).text().trim()}`)
+        Logging.info(Logging.LogSource.Crawler, `got ${label}: ${$(data).text().trim()}`)
     }
 
     let data = $(selector).map((_, el) => $(el).text().trim()).get(); 
