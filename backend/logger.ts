@@ -11,6 +11,6 @@ export enum LogType {
     Info = "Info"
 }
 
-export function error(source: LogSource, message: string) { console.log(`[${source}] ${LogType.Error}: ${message}`); }
-export function info(source: LogSource, message: string) { console.log(`[${source}] ${LogType.Info}: ${message}`);}
-export function warn(source: LogSource, message: string) { console.log(`[${source}] ${LogType.Warning}: ${message}`);}
+export function error(source: LogSource, message: string) { console.log(`${new Date().toISOString()} - [${source}] ${LogType.Error}: ${message}`); }
+export function info(source: LogSource, message: string) { console.log(` ${new Date().toISOString()} - [${source}] ${LogType.Info}: ${message}`);}
+export function warn(source: LogSource, message: string) { console.log(`${new Date().toISOString()} - [${source}] ${LogType.Warning}: ${message}`);}
