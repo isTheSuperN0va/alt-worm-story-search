@@ -52,12 +52,12 @@ setupCrawling() {
 public formatPage(): void {
     const $ = cheerio.load(this.dataCurrent);
 
-    const $titles = this.cheerioElementData($, 'h4.heading:nth-child(1)');
-    const $authors = this.cheerioElementData($, 'h4.heading:nth-child(2)');
-    const $summaries = this.cheerioElementData($, '.blockquote:nth-child(1)');
-    const $chapters_released = this.cheerioElementData($, '.stats:nth-child(6):nth-child(1)');
+    const $titles = this.cheerioElementData($, 'h4.heading > a:first-child', 'title');
+    const $authors = this.cheerioElementData($, 'h4.heading > a[rel="author"]', 'author');
+    const $summaries = this.cheerioElementData($, 'blockquote.summary', 'summary');
+    const $chapters_released = this.cheerioElementData($, 'dd.chapters > a', 'chapters_released');
     const $fandoms = this.handleAo3Fandoms($, '.fandoms.heading'); // <- funky shit here
-    const $updated = this.cheerioElementData($, '.datetime'); // note to self: ao3 doesn't put published date on the page, wowie, i loooove ao3's ux design >:(
+    const $updated = this.cheerioElementData($, '.datetime', 'updated date'); // note to self: ao3 doesn't put published date on the page, wowie, i loooove ao3's ux design >:(
 
 
     // for now i'll do this, the above should only go if the check for 'does this story exist yet on the database?' fails
@@ -127,8 +127,12 @@ parsePage() {
 
 }
 
-cheerioElementData($: cheerio.CheerioAPI, selector: string) {
-    let data = $(selector).map((_, el) => $(el).text()).get(); 
+cheerioElementData($: cheerio.CheerioAPI, selector: string, label: string) {
+    for (const data of $(selector)) {
+        console.log(`got ${label}: ${$(data).text().trim()}`)
+    }
+
+    let data = $(selector).map((_, el) => $(el).text().trim()).get(); 
     
     return data!;
 }
