@@ -6,6 +6,8 @@ searchForm.addEventListener("submit", async (event) => {
 
     title.classList.add("inactive");
 
-    console.log("ayaya");
+    const res = await fetch("/api/stories");
+    const stories = await res.json();
+    console.log(stories);
 });
 
