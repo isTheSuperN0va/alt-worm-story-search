@@ -61,21 +61,37 @@ public formatPage(): void {
 
 
     // for now i'll do this, the above should only go if the check for 'does this story exist yet on the database?' fails
-    this.db.query(`INSERT INTO stories (title, author, summary, chapters_released, updated, fandom) VALUES (${$titles[0]}, ${$authors[0]}, ${$summaries[0]}, ${$chapters_released[0]}, ${$updated[0]}, ${$fandoms![0]})`)
+    
+    const insert = this.db.query(`INSERT INTO stories 
+        (title, author, summary, chapters_released, updated, fandom) 
+        VALUES (?, ?, ?, ?, ?, ?)`)
+
+    const title = $titles[0];
+    const author = $authors[0];
+
+
+
+    if (!title || !author) {
+        console.log("error: missing required story data");
+    }
+
+    insert.run
+    (
+        title ?? "",
+        author ?? "",
+        $summaries[0] ?? "",
+        $chapters_released[0] ?? 1,
+        $updated[0] ?? " ",
+        $fandoms[0] ?? null
+    );
 
 }
 
-handleAo3Fandoms($: cheerio.CheerioAPI, selector: string) {
+handleAo3Fandoms($: cheerio.CheerioAPI, selector: string): (string | undefined)[] {
     let elements = $(selector);
 
 
-    let fandoms: (string | null)[] = [];
-    
-    if (elements === undefined) {
-        console.log("Something went wrong when parsing Ao3 fandoms")
-        return null;
-    }
-
+    let fandoms: (string | undefined)[] = [];
     
 
     for (let fandomBox of elements.toArray()) {
@@ -83,7 +99,7 @@ handleAo3Fandoms($: cheerio.CheerioAPI, selector: string) {
         const filtered = $(fandomBox).children().filter((_, el) => $(el).text() !== "Parahumans Series - Wildbow").toArray();
 
         if ($(filtered).toArray().length === 0)
-            fandoms.push(null);
+            fandoms.push(undefined);
         else
             if ($(filtered).toArray()[0] !== undefined)
                 fandoms.push($($(filtered).toArray()[0]).text());
@@ -112,7 +128,9 @@ parsePage() {
 }
 
 cheerioElementData($: cheerio.CheerioAPI, selector: string) {
-    return $(selector).map((_, el) => $(el).text()).get();
+    let data = $(selector).map((_, el) => $(el).text()).get(); 
+    
+    return data!;
 }
 
 }
