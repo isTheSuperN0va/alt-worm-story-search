@@ -15,7 +15,7 @@ type StoryData = {
     summary: string,
     chapters_released: number,
     updated: string,
-    fandom: string,
+    fandom: string | null,
 
     // url: string,
     // kudos: number,
@@ -50,15 +50,17 @@ export class crawler {
 
         data = $(selector).map((_, el) => $(el).text().trim()).get(); 
         
+        if (selector === 'dd.chapters > a') for (const datai of data) Logging.info(Logging.LogSource.Crawler, datai);
+
         return data!;
     }
 
-    createStoryData(title: string, author: string, summary: string, chapters_released: string, updated: string, fandom: string): StoryData {
+    createStoryData(title: string, author: string, summary: string, chapters_released: number, updated: string, fandom: string | null): StoryData {
         let storyData: StoryData = {
             title: title,
             author: author,
             summary: summary,
-            chapters_released: Number(chapters_released),
+            chapters_released: chapters_released,
             updated: updated,
             fandom: fandom,
         }
@@ -104,48 +106,80 @@ setupCrawling() {
     this.setupScheduledCrawl(this.delayMiliseconds)
 }
 
-public formatPage(): void {
-    const $ = cheerio.load(this.dataCurrent);
+public getStoryData($: cheerio.CheerioAPI, work: Element): StoryData {
+    let title = $(work).find('h4.heading > a:first-child').text().trim();
+    let author = $(work).find('h4.heading > a[rel="author"]').text().trim();
+    let summaries = $(work).find('blockquote.summary').text().trim();
+    let chapters_released = $(work).find('dd.chapters > a').text().trim();
+    let fandom = this.handleAo3Fandom($, $(work).find('h5.fandoms > a'));
+    let updated = $(work).find('.datetime').text().trim();
 
-    const $titles = this.cheerioElementData($, 'h4.heading > a:first-child', 'title');
-    const $authors = this.cheerioElementData($, 'h4.heading > a[rel="author"]', 'author');
-    const $summaries = this.cheerioElementData($, 'blockquote.summary', 'summary');
-    const $chapters_released = this.cheerioElementData($, 'dd.chapters > a', 'chapters_released');
-    const $fandoms = this.handleAo3Fandoms($, '.fandoms.heading'); // <- funky shit here
-    const $updated = this.cheerioElementData($, '.datetime', 'updated date'); // note to self: ao3 doesn't put published date on the page, wowie, i loooove ao3's ux design >:(
+    let chapters_number: number = 0;
 
+    if (Number.isNaN(chapters_released))
+        Logging.info(Logging.LogSource.Crawler, `Failed to get number of chapters in story ${title}, trying alternative...` )
+        chapters_number = this.getAltChaptersReleased($(work).find('dd.chapters').text());
+        if (!chapters_number)
+            Logging.error(Logging.LogSource.Crawler, "Failure to get number of chapters");
 
-    // for now i'll do this, the above should only go if the check for 'does this story exist yet on the database?' fails
     
-    
-    let storiesData: StoryData[] = [];
-    for (let i = 0; i < 20; i++) // change 20 to some variable that's calculated as the amount of stories per page.
-        storiesData[i] = this.createStoryData($titles![i]!, $authors![i]!, $summaries![i]!, $chapters_released![i]!, $updated![i]!, $fandoms[i]!);
-
+    let data: StoryData = this.createStoryData(title, author, summaries, chapters_number, updated, fandom);
+    return data;
 
 }
 
-handleAo3Fandoms($: cheerio.CheerioAPI, selector: string): (string | undefined)[] {
-    let elements = $(selector);
+getAltChaptersReleased(chapters: string): number {
+    Logging.info(Logging.LogSource.Parser, `Trying with ${chapters} `);
+    let chapterInfo = chapters.split("/");
+    Logging.info(Logging.LogSource.Parser, `Got ${chapterInfo[0]} and ${chapterInfo[1]} `)
 
+    if (!chapterInfo) {
+        Logging.error(Logging.LogSource.Parser, 'Chapter number returned as null');
+        return 0;
+    }
+    if (Number.isNaN(chapterInfo[0])) {
+        Logging.error(Logging.LogSource.Parser, 'Chapter number is NaN');
+        return 0;
+    }
+    if (chapterInfo === undefined) {
+        Logging.error(Logging.LogSource.Parser, 'Chapter number is undefined');
+        return 0;
+    }
+    
+    return Number(chapterInfo[0])!;
+}
 
-    let fandoms: (string | undefined)[] = [];
+public processPage(): void {
+    Logging.info(Logging.LogSource.Crawler, 'Started processing page');
+
+    const $ = cheerio.load(this.dataCurrent);
+    let works: cheerio.Cheerio<Element> = $('li.work');
+
+    if (!works)
+        Logging.info(Logging.LogSource.Crawler, 'Did not get any story in the page');
+
+    for (const work of works.toArray()) {
+        let storyData = this.getStoryData($, work);
+        this.insertStoryInDatabase(storyData);
+    }
     
 
-    for (let fandomBox of elements.toArray()) {
-        $(fandomBox).children().first().remove();
-        const filtered = $(fandomBox).children().filter((_, el) => $(el).text() !== "Parahumans Series - Wildbow").toArray();
+}
 
-        if ($(filtered).toArray().length === 0)
-            fandoms.push(undefined);
-        else
-            if ($(filtered).toArray()[0] !== undefined)
-                fandoms.push($($(filtered).toArray()[0]).text());
+handleAo3Fandom($: cheerio.CheerioAPI, elements: cheerio.Cheerio<Element>): string | null {
+    let filteredFandoms = elements.toArray().filter((el) => $(el).text() !== "Parahumans Series - Wildbow");
 
-
+    if (filteredFandoms[0] === undefined) {
+        Logging.error(Logging.LogSource.Crawler, "Handling Ao3 fandom failed.");
+        return null;
     }
 
-    return fandoms!;
+    if (!filteredFandoms[0]) {
+        Logging.info(Logging.LogSource.Crawler, "Processed non-crossover story.");
+        return null;
+    }
+
+    return $(filteredFandoms[0]).text().trim();
 }
 
 

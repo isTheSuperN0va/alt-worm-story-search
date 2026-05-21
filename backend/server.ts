@@ -45,4 +45,4 @@ console.log(`Listening on port ${portNumber}.`)
 let ao3Crawler = new crawler.crawlerAo3(db);
 
 await ao3Crawler.fetchSite();
-ao3Crawler.formatPage();
+ao3Crawler.processPage();
