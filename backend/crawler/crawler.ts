@@ -41,11 +41,14 @@ export class crawler {
     }
 
     cheerioElementData($: cheerio.CheerioAPI, selector: string, label: string) {
-        for (const data of $(selector)) {
-            Logging.info(Logging.LogSource.Crawler, `got ${label}: ${$(data).text().trim()}`)
+        let data: string[] = [];
+
+        if ($(selector) === undefined) {
+            Logging.error(Logging.LogSource.Crawler, `Failed to get page element ${label} with jQuery`);
+            return;
         }
 
-        let data = $(selector).map((_, el) => $(el).text().trim()).get(); 
+        data = $(selector).map((_, el) => $(el).text().trim()).get(); 
         
         return data!;
     }
@@ -87,18 +90,14 @@ public formatPage(): void {
 
     // for now i'll do this, the above should only go if the check for 'does this story exist yet on the database?' fails
     
+    
+    let storiesData: StoryData[] = [];
+    for (let i = 0; i < 20; i++) // change 20 to some variable that's calculated as the amount of stories per page.
+        storiesData[i] = this.createStoryData($titles![i]!, $authors![i]!, $summaries![i]!, $chapters_released![i]!, $updated![i]!, $fandoms![i]!);
+
     const insert = this.db.query(`INSERT INTO stories 
-        (title, author, summary, chapters_released, updated, fandom) 
-        VALUES (?, ?, ?, ?, ?, ?)`)
-
-    const title = $titles[0];
-    const author = $authors[0];
-
-
-
-    if (!title || !author) {
-        Logging.error(Logging.LogSource.Parser, "Missing required story data")
-    }
+    (title, author, summary, chapters_released, updated, fandom) 
+    VALUES (?, ?, ?, ?, ?, ?)`);
 
     insert.run
     (
@@ -135,7 +134,6 @@ handleAo3Fandoms($: cheerio.CheerioAPI, selector: string): (string | undefined)[
 
     }
 
-    console.log(fandoms.length)    
     return fandoms!;
 }
 
