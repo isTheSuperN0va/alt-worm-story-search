@@ -32,11 +32,21 @@ export class crawler {
     setupScheduledCrawl(delayMiliseconds: number): void { 
         setInterval(() => this.fetchSite(), delayMiliseconds) }
 
-    async fetchSite(): Promise<void> {
-        const res = await fetch ("https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works");
+        async fetchSite(): Promise<void> {
+            const res = await fetch ("https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works");
+            
+            this.dataCurrent = await res.text();
+            Logging.info(Logging.LogSource.Http, "Fetched AO3 page")
+    }
+
+    cheerioElementData($: cheerio.CheerioAPI, selector: string, label: string) {
+        for (const data of $(selector)) {
+            Logging.info(Logging.LogSource.Crawler, `got ${label}: ${$(data).text().trim()}`)
+        }
+
+        let data = $(selector).map((_, el) => $(el).text().trim()).get(); 
         
-        this.dataCurrent = await res.text();
-        Logging.info(Logging.LogSource.Http, "Fetched AO3 page")
+        return data!;
     }
 
 }
@@ -129,16 +139,6 @@ bootstrap() {
 
 parsePage() {
 
-}
-
-cheerioElementData($: cheerio.CheerioAPI, selector: string, label: string) {
-    for (const data of $(selector)) {
-        Logging.info(Logging.LogSource.Crawler, `got ${label}: ${$(data).text().trim()}`)
-    }
-
-    let data = $(selector).map((_, el) => $(el).text().trim()).get(); 
-    
-    return data!;
 }
 
 }
