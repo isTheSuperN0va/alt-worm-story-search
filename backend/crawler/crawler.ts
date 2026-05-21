@@ -10,15 +10,16 @@ type PageData = {
 }
 
 type StoryData = {
+    title: string,
     author: string,
     summary: string,
     chapters_released: number,
     updated: string,
     fandom: string,
 
-    url: string,
-    kudos: number,
-    wordcount: number
+    // url: string,
+    // kudos: number,
+    // wordcount: number
 }
 
 export class crawler {
@@ -47,6 +48,19 @@ export class crawler {
         let data = $(selector).map((_, el) => $(el).text().trim()).get(); 
         
         return data!;
+    }
+
+    createStoryData(title: string, author: string, summary: string, chapters_released: string, updated: string, fandom: string): StoryData {
+        let storyData: StoryData = {
+            title: title,
+            author: author,
+            summary: summary,
+            chapters_released: Number(chapters_released),
+            updated: updated,
+            fandom: fandom,
+        }
+
+        return storyData;
     }
 
 }
@@ -121,14 +135,7 @@ handleAo3Fandoms($: cheerio.CheerioAPI, selector: string): (string | undefined)[
 
     }
 
-    console.log(fandoms.length)
-    
-
-
-
-
-    
-
+    console.log(fandoms.length)    
     return fandoms!;
 }
 
