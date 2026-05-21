@@ -63,6 +63,14 @@ export class crawler {
             fandom: fandom,
         }
 
+        Logging.info(Logging.LogSource.Parser, `
+            Compiled story
+            title: ${storyData.title};
+            author: ${storyData.author};
+            chapters: ${storyData.chapters_released};
+            updated: ${storyData.updated};
+            fandom: ${storyData.fandom ?? "None"};`);
+
         return storyData;
     }
 
@@ -93,7 +101,7 @@ public formatPage(): void {
     
     let storiesData: StoryData[] = [];
     for (let i = 0; i < 20; i++) // change 20 to some variable that's calculated as the amount of stories per page.
-        storiesData[i] = this.createStoryData($titles![i]!, $authors![i]!, $summaries![i]!, $chapters_released![i]!, $updated![i]!, $fandoms![i]!);
+        storiesData[i] = this.createStoryData($titles![i]!, $authors![i]!, $summaries![i]!, $chapters_released![i]!, $updated![i]!, $fandoms[i]!);
 
     const insert = this.db.query(`INSERT INTO stories 
     (title, author, summary, chapters_released, updated, fandom) 
