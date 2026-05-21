@@ -74,6 +74,25 @@ export class crawler {
         return storyData;
     }
 
+    insertStoryInDatabase(data: StoryData) {
+        const insert = this.db.query(`INSERT INTO stories 
+        (title, author, summary, chapters_released, updated, fandom) 
+        VALUES (?, ?, ?, ?, ?, ?)`);
+
+        insert.run
+        (
+            data.title,
+            data.author,
+            data.summary,
+            data.chapters_released,
+            data.updated,
+            data.fandom
+        );
+
+        Logging.info(Logging.LogSource.Database, "Inserted 20 stories of page 0");
+
+    }
+
 }
 
 export class crawlerAo3 extends crawler {
@@ -103,22 +122,6 @@ public formatPage(): void {
     for (let i = 0; i < 20; i++) // change 20 to some variable that's calculated as the amount of stories per page.
         storiesData[i] = this.createStoryData($titles![i]!, $authors![i]!, $summaries![i]!, $chapters_released![i]!, $updated![i]!, $fandoms[i]!);
 
-    const insert = this.db.query(`INSERT INTO stories 
-    (title, author, summary, chapters_released, updated, fandom) 
-    VALUES (?, ?, ?, ?, ?, ?)`);
-
-    insert.run
-    (
-        title ?? "",
-        author ?? "",
-        $summaries[0] ?? "",
-        $chapters_released[0] ?? 1,
-        $updated[0] ?? " ",
-        $fandoms[0] ?? null
-    );
-
-    Logging.info(Logging.LogSource.Database, "Inserted 20 stories of page 0");
-    // lotta work to do here, also refactor?
 
 }
 
