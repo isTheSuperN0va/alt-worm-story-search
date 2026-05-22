@@ -104,7 +104,7 @@ public delayMiliseconds: number = 1000 * 10;
 
 private static SELECTOR_WORKS = 'li.work';
 private static SELECTOR_TITLE = 'h4.heading > a:first-child';
-private static SELECTOR_AUTHOR = 'h4.heading > a[rel="author"';
+private static SELECTOR_AUTHOR = 'h4.heading > a[rel="author"]';
 private static SELECTOR_SUMMARY = 'blockquote.summary';
 private static SELECTOR_CHAPTERS = 'dd.chapters > a';
 private static SELECTOR_FANDOM = 'h5.fandoms > a';
