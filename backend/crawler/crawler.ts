@@ -30,11 +30,11 @@ export class crawler {
         this.db = db
     }
 
-    setupScheduledCrawl(delayMiliseconds: number): void { 
-        setInterval(() => this.fetchSite(), delayMiliseconds) }
+    // setupScheduledCrawl(delayMiliseconds: number): void { 
+    //     setInterval(() => this.fetchSite(), delayMiliseconds) }
 
-        async fetchSite(): Promise<void> {
-            const res = await fetch ("https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works");
+    async fetchSite(baseUrl: string): Promise<void> {
+            const res = await fetch (`${baseUrl}`);
             
             this.dataCurrent = await res.text();
             Logging.info(Logging.LogSource.Http, "Fetched AO3 page")
@@ -101,18 +101,29 @@ export class crawlerAo3 extends crawler {
 
 public delayMiliseconds: number = 1000 * 10;
 
-setupCrawling() {
-    let response: JSON;
-    this.setupScheduledCrawl(this.delayMiliseconds)
-}
+
+private static SELECTOR_WORKS = 'li.work';
+private static SELECTOR_TITLE = 'h4.heading > a:first-child';
+private static SELECTOR_AUTHOR = 'h4.heading > a[rel="author"';
+private static SELECTOR_SUMMARY = 'blockquote.summary';
+private static SELECTOR_CHAPTERS = 'dd.chapters > a';
+private static SELECTOR_FANDOM = 'h5.fandoms > a';
+private static SELECTOR_UPDATED = '.datetime';
+
+public static BASE_URL = 'https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works';
+
+// setupCrawling() {
+//     let response: JSON;
+//     this.setupScheduledCrawl(this.delayMiliseconds)
+// }
 
 public getStoryData($: cheerio.CheerioAPI, work: Element): StoryData {
-    let title = $(work).find('h4.heading > a:first-child').text().trim();
-    let author = $(work).find('h4.heading > a[rel="author"]').text().trim();
-    let summaries = $(work).find('blockquote.summary').text().trim();
-    let chapters_released = $(work).find('dd.chapters > a').text().trim();
-    let fandom = this.handleAo3Fandom($, $(work).find('h5.fandoms > a'));
-    let updated = $(work).find('.datetime').text().trim();
+    let title = $(work).find(crawlerAo3.SELECTOR_TITLE).text().trim();
+    let author = $(work).find(crawlerAo3.SELECTOR_AUTHOR).text().trim();
+    let summaries = $(work).find(crawlerAo3.SELECTOR_SUMMARY).text().trim();
+    let chapters_released = $(work).find(crawlerAo3.SELECTOR_CHAPTERS).text().trim();
+    let fandom = this.handleAo3Fandom($, $(work).find(crawlerAo3.SELECTOR_FANDOM));
+    let updated = $(work).find(crawlerAo3.SELECTOR_UPDATED).text().trim();
 
     let chapters_number: number = 0;
 
@@ -153,7 +164,7 @@ public processPage(): void {
     Logging.info(Logging.LogSource.Crawler, 'Started processing page');
 
     const $ = cheerio.load(this.dataCurrent);
-    let works: cheerio.Cheerio<Element> = $('li.work');
+    let works: cheerio.Cheerio<Element> = $('li.work'); // ?, when i put a property here it spits out a type error, may be something to do with mutability
 
     if (!works)
         Logging.info(Logging.LogSource.Crawler, 'Did not get any story in the page');
