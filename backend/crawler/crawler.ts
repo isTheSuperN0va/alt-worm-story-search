@@ -146,12 +146,12 @@ public getStoryData($: cheerio.CheerioAPI, work: Element): StoryData {
 
     let chapters_number: number = 0;
 
-    if (Number.isNaN(chapters_released))
+    if (Number.isNaN(chapters_released)) {
         Logging.warn(Logging.LogSource.Crawler, `   Failed to get number of chapters in story ${title}, trying alternative...` )
         chapters_number = this.getAltChaptersReleased($(work).find('dd.chapters').text());
         if (!chapters_number)
             Logging.error(Logging.LogSource.Crawler, "  Failure to get number of chapters");
-
+    }
     let data: StoryData = this.createStoryData(title, author, summaries, chapters_number, updated, fandom);
     return data;
 
@@ -205,12 +205,7 @@ handleAo3Fandom($: cheerio.CheerioAPI, elements: cheerio.Cheerio<Element>): stri
     let filteredFandoms = elements.toArray().filter((el) => $(el).text() !== "Parahumans Series - Wildbow");
 
     if (filteredFandoms[0] === undefined) {
-        Logging.error(Logging.LogSource.Crawler, "Handling Ao3 fandom failed.");
-        return null;
-    }
-
-    if (!filteredFandoms[0]) {
-        Logging.info(Logging.LogSource.Crawler, "Processed non-crossover story.");
+        Logging.error(Logging.LogSource.Crawler, "Processed non-crossover story.");
         return null;
     }
 
