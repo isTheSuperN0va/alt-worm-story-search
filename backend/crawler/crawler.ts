@@ -114,6 +114,23 @@ export class crawler {
         }
     }
 
+    doesSourceExist(url: string): boolean {
+        const query = this.db.query(`
+            SELECT * FROM sources
+            WHERE url = ?`);
+
+        const row = query.get();
+
+        if (row) {
+            Logging.info(Logging.LogSource.Database, '  Source already exists');
+            return false;
+        }
+        else {
+            Logging.info(Logging.LogSource.Database, '  Source does not exists');
+            return true;
+
+        }
+    }
 }
 
 export class crawlerAo3 extends crawler {
