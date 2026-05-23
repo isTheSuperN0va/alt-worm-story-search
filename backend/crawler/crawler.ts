@@ -65,13 +65,7 @@ export class crawler {
             fandom: fandom,
         }
 
-        Logging.info(Logging.LogSource.Parser, `
-            Compiled story
-            title: ${storyData.title};
-            author: ${storyData.author};
-            chapters: ${storyData.chapters_released};
-            updated: ${storyData.updated};
-            fandom: ${storyData.fandom ?? "None"};`);
+        Logging.info(Logging.LogSource.Parser, `    Created StoryData for ${storyData.title}`);
 
         return storyData;
     }
@@ -80,6 +74,14 @@ export class crawler {
         const insert = this.db.query(`INSERT INTO stories 
         (title, author, summary, chapters_released, updated, fandom) 
         VALUES (?, ?, ?, ?, ?, ?)`);
+
+        Logging.info(Logging.LogSource.Database, `
+            Inserting story;
+            title: ${data.title};
+            author: ${data.author};
+            chapters: ${data.chapters_released};
+            updated: ${data.updated};
+            fandom: ${data.fandom ?? "None"};`);
 
         insert.run
         (
@@ -91,7 +93,7 @@ export class crawler {
             data.fandom
         );
 
-        Logging.info(Logging.LogSource.Database, "Inserted 20 stories of page 0");
+        Logging.info(Logging.LogSource.Database, "Success");
 
     }
 
@@ -102,8 +104,14 @@ export class crawler {
 
         const row = query.get(title, author);
 
-        if (row) return true;
-        else return false;
+        if (row) {
+            Logging.info(Logging.LogSource.Database, '  New story found');
+            return true;
+        }
+        else {
+            Logging.info(Logging.LogSource.Database, '  Story already exists')
+            return false;
+        }
     }
 
 }
@@ -139,12 +147,11 @@ public getStoryData($: cheerio.CheerioAPI, work: Element): StoryData {
     let chapters_number: number = 0;
 
     if (Number.isNaN(chapters_released))
-        Logging.info(Logging.LogSource.Crawler, `Failed to get number of chapters in story ${title}, trying alternative...` )
+        Logging.warn(Logging.LogSource.Crawler, `   Failed to get number of chapters in story ${title}, trying alternative...` )
         chapters_number = this.getAltChaptersReleased($(work).find('dd.chapters').text());
         if (!chapters_number)
-            Logging.error(Logging.LogSource.Crawler, "Failure to get number of chapters");
+            Logging.error(Logging.LogSource.Crawler, "  Failure to get number of chapters");
 
-    
     let data: StoryData = this.createStoryData(title, author, summaries, chapters_number, updated, fandom);
     return data;
 
@@ -156,15 +163,15 @@ getAltChaptersReleased(chapters: string): number {
     Logging.info(Logging.LogSource.Parser, `Got ${chapterInfo[0]} and ${chapterInfo[1]} `)
 
     if (!chapterInfo) {
-        Logging.error(Logging.LogSource.Parser, 'Chapter number returned as null');
+        Logging.error(Logging.LogSource.Parser, '   Chapter number returned as null');
         return 0;
     }
     if (Number.isNaN(chapterInfo[0])) {
-        Logging.error(Logging.LogSource.Parser, 'Chapter number is NaN');
+        Logging.error(Logging.LogSource.Parser, '   Chapter number is NaN');
         return 0;
     }
     if (chapterInfo === undefined) {
-        Logging.error(Logging.LogSource.Parser, 'Chapter number is undefined');
+        Logging.error(Logging.LogSource.Parser, '   Chapter number is undefined');
         return 0;
     }
     
@@ -181,14 +188,12 @@ public processPage(): void {
         Logging.info(Logging.LogSource.Crawler, 'Did not get any story in the page');
 
     for (const work of works.toArray()) {
+        Logging.info(Logging.LogSource.Parser, 'Started parsing story...')
         let storyData = this.getStoryData($, work);
 
-        if (!(this.doesStoryExist(storyData.title, storyData.author))) {
-            Logging.info(Logging.LogSource.Database, 'New story found');
+        if (!(this.doesStoryExist(storyData.title, storyData.author)))
             this.insertStoryInDatabase(storyData);
-        }
         
-        Logging.info(Logging.LogSource.Database, `Story '${storyData.title} by ${storyData.author} already exists'`)
 
         
     }
