@@ -1,8 +1,3 @@
 node_modules/
-*.sqlite-shm
-*.sqlite-wal
-*.db-shm
-*.db-wal
-*.db
-
+backend/database/
 *.sqlite
