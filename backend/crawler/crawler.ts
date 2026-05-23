@@ -22,6 +22,12 @@ type StoryData = {
     // wordcount: number
 }
 
+type SourceData = {
+    url: string,
+    rating: number,
+    updated: string 
+}
+
 export class crawler {
     protected db: Database;
     public dataCurrent: string = "";
@@ -68,6 +74,17 @@ export class crawler {
         Logging.info(Logging.LogSource.Parser, `    Created StoryData for ${storyData.title}`);
 
         return storyData;
+    }
+
+    createSourceData(url: string, rating: number, updated: string) {
+        let sourceData: SourceData = {
+            url: url,
+            rating: rating,
+            updated: updated
+        }
+
+        Logging.info(Logging.LogSource.Parser, `    Created SourceData for ${sourceData.url}`);
+        return sourceData;
     }
 
     insertStoryInDatabase(data: StoryData) {
@@ -146,6 +163,9 @@ private static SELECTOR_CHAPTERS = 'dd.chapters > a';
 private static SELECTOR_FANDOM = 'h5.fandoms > a';
 private static SELECTOR_UPDATED = '.datetime';
 
+private static SELECTOR_URL = 'h4.heading > a:first-child';
+private static SELECTOR_RATING = 'dd.kudos > a';
+
 public static BASE_URL = 'https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works';
 
 // setupCrawling() {
@@ -172,6 +192,23 @@ public getStoryData($: cheerio.CheerioAPI, work: Element): StoryData {
     let data: StoryData = this.createStoryData(title, author, summaries, chapters_number, updated, fandom);
     return data;
 
+}
+
+public getSourceData($: cheerio.CheerioAPI, work: Element): SourceData {
+    let url = $(work).find(crawlerAo3.SELECTOR_URL).attr('href')?.trim();
+    let rating = $(work).find(crawlerAo3.SELECTOR_RATING).text().trim();
+    let updated = $(work).find(crawlerAo3.SELECTOR_UPDATED).text().trim();
+
+    if (Number.isNaN(rating)) {
+        Logging.error(Logging.LogSource.Parser, '   Rating is NaN');
+    }
+
+    if (url === undefined) {
+        Logging.error(Logging.LogSource.Parser, '   Url is undefined')
+    }
+    
+    let data: SourceData = this.createSourceData(url!, Number(rating), updated) // for now i'll do this, but i should do more checking later
+    return data;
 }
 
 getAltChaptersReleased(chapters: string): number {
