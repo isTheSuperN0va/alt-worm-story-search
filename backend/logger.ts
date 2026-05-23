@@ -11,6 +11,27 @@ export enum LogType {
     Info = "\x1b[34mInfo\x1b[0m"
 }
 
-export function error(source: LogSource, message: string) { console.log(`${new Date().toISOString()} - [${source}/${LogType.Error}]: ${message}`); }
-export function info(source: LogSource, message: string) { console.log(` ${new Date().toISOString()} - [${source}/${LogType.Info}]:  ${message}`);}
-export function warn(source: LogSource, message: string) { console.log(`${new Date().toISOString()} - [${source}/${LogType.Warning}]: ${message}`);}
+function formatMessage(message: string): string {
+    const lastChar = message[message.length - 1];
+
+    if (lastChar == ".")
+        message.replace(".", ";");
+
+    if (lastChar != ";")
+        message += ";";
+
+    return message;
+}
+
+export function error(source: LogSource, message: string) {
+    let formattedMessage = formatMessage(message); 
+    console.log(`${new Date().toISOString()} - [${source}/${LogType.Error}]: ${formattedMessage}`); 
+}
+export function info(source: LogSource, message: string) {
+    let formattedMessage = formatMessage(message); 
+    console.log(` ${new Date().toISOString()} - [${source}/${LogType.Info}]:  ${formattedMessage}`);
+}
+export function warn(source: LogSource, message: string) {
+    let formattedMessage = formatMessage(message); 
+    console.log(`${new Date().toISOString()} - [${source}/${LogType.Warning}]: ${formattedMessage}`);
+}
