@@ -87,7 +87,7 @@ export class crawler {
         return sourceData;
     }
 
-    insertStoryInDatabase(data: StoryData) {
+    insertStoryInDatabase(data: StoryData): number | bigint {
         const insert = this.db.query(`INSERT INTO stories 
         (title, author, summary, chapters_released, updated, fandom) 
         VALUES (?, ?, ?, ?, ?, ?)`);
@@ -100,7 +100,7 @@ export class crawler {
             updated: ${data.updated};
             fandom: ${data.fandom ?? "None"};`);
 
-        insert.run
+        const inserted = insert.run
         (
             data.title,
             data.author,
@@ -110,8 +110,30 @@ export class crawler {
             data.fandom
         );
 
-        Logging.info(Logging.LogSource.Database, "Success");
+        Logging.info(Logging.LogSource.Database, "  Success");
+        return inserted.lastInsertRowid;
+    }
 
+    insertSouceInDatabase(story_id: number | bigint, data: SourceData): number | bigint {
+        const insert = this.db.query(`INSERT INTO sources 
+        (story_id, url, rating, updated)
+        VALUES (?, ?, ?, ?)`);
+
+        Logging.info(Logging.LogSource.Database, `
+            Inserting source;
+            url: ${data.url};
+            rating: ${data.rating};
+            updated: ${data.updated};`)
+
+        const inserted = insert.run(
+            story_id,
+            data.url,
+            data.rating,
+            data.updated
+        );
+
+        Logging.info(Logging.LogSource.Database ,'  Success');
+        return inserted.lastInsertRowid;
     }
 
     doesStoryExist(title: string, author: string): boolean {
@@ -136,7 +158,7 @@ export class crawler {
             SELECT * FROM sources
             WHERE url = ?`);
 
-        const row = query.get();
+        const row = query.get(url);
 
         if (row) {
             Logging.info(Logging.LogSource.Database, '  Source already exists');
@@ -148,6 +170,23 @@ export class crawler {
 
         }
     }
+
+    getStoryId(title: string, author: string): number | bigint | null {
+        const query = this.db.query(`
+            SELECT id FROM stories
+            WHERE title = ? AND author = ?`);
+        
+        const row = query.get(title, author) as { id: number | bigint} | null;
+
+        if (!row) {
+            Logging.error(Logging.LogSource.Database, ' Failed to get story_id')
+            return null;
+        }
+
+        return row.id;
+    }
+
+    
 }
 
 export class crawlerAo3 extends crawler {
@@ -243,13 +282,18 @@ public processPage(): void {
 
     for (const work of works.toArray()) {
         Logging.info(Logging.LogSource.Parser, 'Started parsing story...')
+        
         let storyData = this.getStoryData($, work);
+        let story_id: number | bigint | null = 0;
 
         if (!(this.doesStoryExist(storyData.title, storyData.author)))
-            this.insertStoryInDatabase(storyData);
+            story_id = this.insertStoryInDatabase(storyData);
+        else
+            story_id = this.getStoryId(storyData.title, storyData.author);
         
-
-        
+        let sourceData = this.getSourceData($, work);
+        if (!(this.doesSourceExist(sourceData.url)))
+            this.insertSouceInDatabase(story_id!, sourceData);
     }
     
 
