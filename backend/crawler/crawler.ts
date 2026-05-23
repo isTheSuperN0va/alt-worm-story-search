@@ -162,11 +162,11 @@ export class crawler {
 
         if (row) {
             Logging.info(Logging.LogSource.Database, '  Source already exists');
-            return false;
+            return true;
         }
         else {
             Logging.info(Logging.LogSource.Database, '  Source does not exists');
-            return true;
+            return false;
 
         }
     }
@@ -235,7 +235,7 @@ public getStoryData($: cheerio.CheerioAPI, work: Element): StoryData {
 
 public getSourceData($: cheerio.CheerioAPI, work: Element): SourceData {
     let url = $(work).find(crawlerAo3.SELECTOR_URL).attr('href')?.trim();
-    let rating = $(work).find(crawlerAo3.SELECTOR_RATING).text().trim();
+    let rating = $(work).find(crawlerAo3.SELECTOR_RATING).text().trim().replace(",", "");
     let updated = $(work).find(crawlerAo3.SELECTOR_UPDATED).text().trim();
 
     if (Number.isNaN(rating)) {
