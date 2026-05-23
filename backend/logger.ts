@@ -1,11 +1,11 @@
-export enum LogSource {
+export enum Source {
     Database = "DATABASE",
     Crawler = "CRAWLER",
     Http = "HTTP",
     Parser = "PARSER"
 }
 
-export enum LogType {
+export enum Type {
     Error = "\x1b[31mError\x1b[0m",
     Warning = "\x1b[33mWarning\x1b[0m",
     Info = "\x1b[34mInfo\x1b[0m"
@@ -23,15 +23,15 @@ function formatMessage(message: string): string {
     return message;
 }
 
-export function error(source: LogSource, message: string) {
+export function error(source: Source, message: string) {
     let formattedMessage = formatMessage(message); 
-    console.log(`${new Date().toISOString()} - [${source}/${LogType.Error}]: ${formattedMessage}`); 
+    console.log(`${new Date().toISOString()} - [${source}/${Type.Error}]: ${formattedMessage}`); 
 }
-export function info(source: LogSource, message: string) {
+export function info(source: Source, message: string) {
     let formattedMessage = formatMessage(message); 
-    console.log(` ${new Date().toISOString()} - [${source}/${LogType.Info}]:  ${formattedMessage}`);
+    console.log(` ${new Date().toISOString()} - [${source}/${Type.Info}]:  ${formattedMessage}`);
 }
-export function warn(source: LogSource, message: string) {
+export function warn(source: Source, message: string) {
     let formattedMessage = formatMessage(message); 
-    console.log(`${new Date().toISOString()} - [${source}/${LogType.Warning}]: ${formattedMessage}`);
+    console.log(`${new Date().toISOString()} - [${source}/${Type.Warning}]: ${formattedMessage}`);
 }

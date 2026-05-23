@@ -39,20 +39,20 @@ export class crawler {
             const res = await fetch (`${baseUrl}`);
             
             this.dataCurrent = await res.text();
-            Logging.info(Logging.LogSource.Http, "Fetched AO3 page")
+            Logging.info(Logging.Source.Http, "Fetched AO3 page")
     }
 
     cheerioElementData($: cheerio.CheerioAPI, selector: string, label: string) {
         let data: string[] = [];
 
         if ($(selector) === undefined) {
-            Logging.error(Logging.LogSource.Crawler, `Failed to get page element ${label} with jQuery`);
+            Logging.error(Logging.Source.Crawler, `Failed to get page element ${label} with jQuery`);
             return;
         }
 
         data = $(selector).map((_, el) => $(el).text().trim()).get(); 
         
-        if (selector === 'dd.chapters > a') for (const datai of data) Logging.info(Logging.LogSource.Crawler, datai);
+        if (selector === 'dd.chapters > a') for (const datai of data) Logging.info(Logging.Source.Crawler, datai);
 
         return data!;
     }
@@ -67,7 +67,7 @@ export class crawler {
             fandom: fandom,
         }
 
-        Logging.info(Logging.LogSource.Parser, `    Created StoryData for ${storyData.title}`);
+        Logging.info(Logging.Source.Parser, `    Created StoryData for ${storyData.title}`);
 
         return storyData;
     }
@@ -79,7 +79,7 @@ export class crawler {
             updated: updated
         }
 
-        Logging.info(Logging.LogSource.Parser, `    Created SourceData for ${sourceData.url}`);
+        Logging.info(Logging.Source.Parser, `    Created SourceData for ${sourceData.url}`);
         return sourceData;
     }
 
@@ -88,7 +88,7 @@ export class crawler {
         (title, author, summary, chapters_released, updated, fandom) 
         VALUES (?, ?, ?, ?, ?, ?)`);
 
-        Logging.info(Logging.LogSource.Database, `
+        Logging.info(Logging.Source.Database, `
             Inserting story;
             title: ${data.title};
             author: ${data.author};
@@ -106,7 +106,7 @@ export class crawler {
             data.fandom
         );
 
-        Logging.info(Logging.LogSource.Database, "  Success");
+        Logging.info(Logging.Source.Database, "  Success");
         return inserted.lastInsertRowid;
     }
 
@@ -115,7 +115,7 @@ export class crawler {
         (story_id, url, rating, updated)
         VALUES (?, ?, ?, ?)`);
 
-        Logging.info(Logging.LogSource.Database, `
+        Logging.info(Logging.Source.Database, `
             Inserting source;
             url: ${data.url};
             rating: ${data.rating};
@@ -128,7 +128,7 @@ export class crawler {
             data.updated
         );
 
-        Logging.info(Logging.LogSource.Database ,'  Success');
+        Logging.info(Logging.Source.Database ,'  Success');
         return inserted.lastInsertRowid;
     }
 
@@ -140,11 +140,11 @@ export class crawler {
         const row = query.get(title, author);
 
         if (row) {
-            Logging.info(Logging.LogSource.Database, '  Story already exists');
+            Logging.info(Logging.Source.Database, '  Story already exists');
             return true;
         }
         else {
-            Logging.info(Logging.LogSource.Database, '  New story found')
+            Logging.info(Logging.Source.Database, '  New story found')
             return false;
         }
     }
@@ -157,11 +157,11 @@ export class crawler {
         const row = query.get(url);
 
         if (row) {
-            Logging.info(Logging.LogSource.Database, '  Source already exists');
+            Logging.info(Logging.Source.Database, '  Source already exists');
             return true;
         }
         else {
-            Logging.info(Logging.LogSource.Database, '  Source does not exists');
+            Logging.info(Logging.Source.Database, '  Source does not exists');
             return false;
 
         }
@@ -175,7 +175,7 @@ export class crawler {
         const row = query.get(title, author) as { id: number | bigint} | null;
 
         if (!row) {
-            Logging.error(Logging.LogSource.Database, ' Failed to get story_id')
+            Logging.error(Logging.Source.Database, ' Failed to get story_id')
             return null;
         }
 

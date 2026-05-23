@@ -37,10 +37,10 @@ public getStoryData($: cheerio.CheerioAPI, work: Element): crawl.StoryData {
     let chapters_number: number = 0;
 
     if (Number.isNaN(chapters_released)) {
-        Logging.warn(Logging.LogSource.Crawler, `   Failed to get number of chapters in story ${title}, trying alternative...` )
+        Logging.warn(Logging.Source.Crawler, `   Failed to get number of chapters in story ${title}, trying alternative...` )
         chapters_number = this.getAltChaptersReleased($(work).find('dd.chapters').text());
         if (!chapters_number)
-            Logging.error(Logging.LogSource.Crawler, "  Failure to get number of chapters");
+            Logging.error(Logging.Source.Crawler, "  Failure to get number of chapters");
     }
     let data: crawl.StoryData = this.createStoryData(title, author, summaries, chapters_number, updated, fandom);
     return data;
@@ -53,11 +53,11 @@ public getSourceData($: cheerio.CheerioAPI, work: Element): crawl.SourceData {
     let updated = $(work).find(crawlerAo3.SELECTOR_UPDATED).text().trim();
 
     if (Number.isNaN(rating)) {
-        Logging.error(Logging.LogSource.Parser, '   Rating is NaN');
+        Logging.error(Logging.Source.Parser, '   Rating is NaN');
     }
 
     if (url === undefined) {
-        Logging.error(Logging.LogSource.Parser, '   Url is undefined')
+        Logging.error(Logging.Source.Parser, '   Url is undefined')
     }
     
     let data: crawl.SourceData = this.createSourceData(url!, Number(rating), updated) // for now i'll do this, but i should do more checking later
@@ -65,20 +65,20 @@ public getSourceData($: cheerio.CheerioAPI, work: Element): crawl.SourceData {
 }
 
 getAltChaptersReleased(chapters: string): number {
-    Logging.info(Logging.LogSource.Parser, `Trying with ${chapters} `);
+    Logging.info(Logging.Source.Parser, `Trying with ${chapters} `);
     let chapterInfo = chapters.split("/");
-    Logging.info(Logging.LogSource.Parser, `Got ${chapterInfo[0]} and ${chapterInfo[1]} `)
+    Logging.info(Logging.Source.Parser, `Got ${chapterInfo[0]} and ${chapterInfo[1]} `)
 
     if (!chapterInfo) {
-        Logging.error(Logging.LogSource.Parser, '   Chapter number returned as null');
+        Logging.error(Logging.Source.Parser, '   Chapter number returned as null');
         return 0;
     }
     if (Number.isNaN(chapterInfo[0])) {
-        Logging.error(Logging.LogSource.Parser, '   Chapter number is NaN');
+        Logging.error(Logging.Source.Parser, '   Chapter number is NaN');
         return 0;
     }
     if (chapterInfo === undefined) {
-        Logging.error(Logging.LogSource.Parser, '   Chapter number is undefined');
+        Logging.error(Logging.Source.Parser, '   Chapter number is undefined');
         return 0;
     }
     
@@ -86,16 +86,16 @@ getAltChaptersReleased(chapters: string): number {
 }
 
 public processPage(): void {
-    Logging.info(Logging.LogSource.Crawler, 'Started processing page');
+    Logging.info(Logging.Source.Crawler, 'Started processing page');
 
     const $ = cheerio.load(this.dataCurrent);
     let works: cheerio.Cheerio<Element> = $('li.work'); // ?, when i put a property here it spits out a type error, may be something to do with mutability
 
     if (!works)
-        Logging.info(Logging.LogSource.Crawler, 'Did not get any story in the page');
+        Logging.info(Logging.Source.Crawler, 'Did not get any story in the page');
 
     for (const work of works.toArray()) {
-        Logging.info(Logging.LogSource.Parser, 'Started parsing story...')
+        Logging.info(Logging.Source.Parser, 'Started parsing story...')
         
         let storyData = this.getStoryData($, work);
         let story_id: number | bigint | null = 0;
@@ -117,7 +117,7 @@ handleAo3Fandom($: cheerio.CheerioAPI, elements: cheerio.Cheerio<Element>): stri
     let filteredFandoms = elements.toArray().filter((el) => $(el).text() !== "Parahumans Series - Wildbow");
 
     if (filteredFandoms[0] === undefined) {
-        Logging.error(Logging.LogSource.Crawler, "Processed non-crossover story.");
+        Logging.error(Logging.Source.Crawler, "Processed non-crossover story.");
         return null;
     }
 
