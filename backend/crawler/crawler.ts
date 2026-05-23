@@ -105,11 +105,11 @@ export class crawler {
         const row = query.get(title, author);
 
         if (row) {
-            Logging.info(Logging.LogSource.Database, '  New story found');
+            Logging.info(Logging.LogSource.Database, '  Story already exists');
             return true;
         }
         else {
-            Logging.info(Logging.LogSource.Database, '  Story already exists')
+            Logging.info(Logging.LogSource.Database, '  New story found')
             return false;
         }
     }
