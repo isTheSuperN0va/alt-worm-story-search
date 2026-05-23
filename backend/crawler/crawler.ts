@@ -95,6 +95,17 @@ export class crawler {
 
     }
 
+    doesStoryExist(title: string, author: string): boolean {
+        const query = this.db.query(`
+            SELECT * FROM stories
+            WHERE title = ? AND author = ?`);
+
+        const row = query.get(title, author);
+
+        if (row) return true;
+        else return false;
+    }
+
 }
 
 export class crawlerAo3 extends crawler {
@@ -171,7 +182,15 @@ public processPage(): void {
 
     for (const work of works.toArray()) {
         let storyData = this.getStoryData($, work);
-        this.insertStoryInDatabase(storyData);
+
+        if (!(this.doesStoryExist(storyData.title, storyData.author))) {
+            Logging.info(Logging.LogSource.Database, 'New story found');
+            this.insertStoryInDatabase(storyData);
+        }
+        
+        Logging.info(Logging.LogSource.Database, `Story '${storyData.title} by ${storyData.author} already exists'`)
+
+        
     }
     
 
