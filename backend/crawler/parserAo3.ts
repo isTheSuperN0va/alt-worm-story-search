@@ -2,6 +2,7 @@ import * as crawl from './parser.ts'
 import * as Logging from '../logger.ts'
 import * as cheerio from 'cheerio'
 import { Element } from "domhandler";
+import { sleep } from 'bun';
 
 export class ParserAo3 extends crawl.Parser {
 
@@ -125,7 +126,8 @@ handleAo3Fandom(elements: cheerio.Cheerio<Element>): string | null {
 }
 
 getAmountOfPages(): number {
-    let pageAmountString = this.$('ol.pagination > li:nth-last-child(2) > a').text().trim();
+    let pageAmountString = this.$('ol.pagination > li:nth-last-child(2) > a:first-child').first().text();
+
 
     if (Number.isNaN(pageAmountString)) {
         Logging.error(Logging.Source.Crawler, 'Failed to get a coherent page amount for bootstraping');
@@ -133,6 +135,8 @@ getAmountOfPages(): number {
     }
 
     let pageAmount = Number(pageAmountString);
+    Logging.info(Logging.Source.Crawler, `Successfuly acquired page amount, string: ${pageAmountString}, number: ${pageAmount}`);
+    sleep(10000);
     return pageAmount;
 }
 
