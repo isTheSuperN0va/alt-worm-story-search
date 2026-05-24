@@ -85,10 +85,10 @@ getAltChaptersReleased(chapters: string): number {
     return Number(chapterInfo[0])!;
 }
 
-public processPage(): void {
+public processPage(pageHTML: string): void {
     Logging.info(Logging.Source.Crawler, 'Started processing page');
 
-    const $ = cheerio.load(this.dataCurrent);
+    const $ = cheerio.load(pageHTML);
     let works: cheerio.Cheerio<Element> = $('li.work'); // ?, when i put a property here it spits out a type error, may be something to do with mutability
 
     if (!works)
@@ -122,15 +122,6 @@ handleAo3Fandom($: cheerio.CheerioAPI, elements: cheerio.Cheerio<Element>): stri
     }
 
     return $(filteredFandoms[0]).text().trim();
-}
-
-
-bootstrap() {
-
-}
-
-parsePage() {
-
 }
 
 }

@@ -26,21 +26,12 @@ export type SourceData = {
 
 export class Parser {
     protected db: Database;
-    public dataCurrent: string = "";
 
     constructor(db: Database) {
         this.db = db
     }
 
-    // setupScheduledCrawl(delayMiliseconds: number): void { 
-    //     setInterval(() => this.fetchSite(), delayMiliseconds) }
-
-    async fetchSite(baseUrl: string): Promise<void> {
-            const res = await fetch (`${baseUrl}`);
-            
-            this.dataCurrent = await res.text();
-            Logging.info(Logging.Source.Http, "Fetched AO3 page")
-    }
+    
 
     cheerioElementData($: cheerio.CheerioAPI, selector: string, label: string) {
         let data: string[] = [];

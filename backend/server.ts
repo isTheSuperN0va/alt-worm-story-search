@@ -45,5 +45,5 @@ console.log(`Listening on port ${portNumber}.`)
 
 let ao3Crawler = new cAo3.ParserAo3(db);
 
-await ao3Crawler.fetchSite(cAo3.ParserAo3.BASE_URL);
-ao3Crawler.processPage();
+// await ao3Crawler.fetchSite(cAo3.ParserAo3.BASE_URL);
+// ao3Crawler.processPage();
