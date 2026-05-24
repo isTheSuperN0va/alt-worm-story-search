@@ -26,9 +26,12 @@ export type SourceData = {
 
 export class Parser {
     protected db: Database;
+    protected $: cheerio.CheerioAPI;
+    protected pageHtml: string = "";
 
     constructor(db: Database) {
         this.db = db
+        this.$ = cheerio.load(this.pageHtml);
     }
 
     
@@ -36,12 +39,12 @@ export class Parser {
     cheerioElementData($: cheerio.CheerioAPI, selector: string, label: string) {
         let data: string[] = [];
 
-        if ($(selector) === undefined) {
+        if (this.$(selector) === undefined) {
             Logging.error(Logging.Source.Parser, `Failed to get page element ${label} with jQuery`);
             return;
         }
 
-        data = $(selector).map((_, el) => $(el).text().trim()).get(); 
+        data = this.$(selector).map((_, el) => this.$(el).text().trim()).get(); 
         
         if (selector === 'dd.chapters > a') for (const datai of data) Logging.info(Logging.Source.Parser, datai);
 

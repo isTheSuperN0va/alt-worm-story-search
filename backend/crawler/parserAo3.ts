@@ -26,19 +26,19 @@ public static BASE_URL = 'https://archiveofourown.org/tags/Parahumans%20Series%2
 //     this.setupScheduledCrawl(this.delayMiliseconds)
 // }
 
-public getStoryData($: cheerio.CheerioAPI, work: Element): crawl.StoryData {
-    let title = $(work).find(ParserAo3.SELECTOR_TITLE).text().trim();
-    let author = $(work).find(ParserAo3.SELECTOR_AUTHOR).text().trim();
-    let summaries = $(work).find(ParserAo3.SELECTOR_SUMMARY).text().trim();
-    let chapters_released = $(work).find(ParserAo3.SELECTOR_CHAPTERS).text().trim();
-    let fandom = this.handleAo3Fandom($, $(work).find(ParserAo3.SELECTOR_FANDOM));
-    let updated = $(work).find(ParserAo3.SELECTOR_UPDATED).text().trim();
+public getStoryData(work: Element): crawl.StoryData {
+    let title = this.$(work).find(ParserAo3.SELECTOR_TITLE).text().trim();
+    let author = this.$(work).find(ParserAo3.SELECTOR_AUTHOR).text().trim();
+    let summaries = this.$(work).find(ParserAo3.SELECTOR_SUMMARY).text().trim();
+    let chapters_released = this.$(work).find(ParserAo3.SELECTOR_CHAPTERS).text().trim();
+    let fandom = this.handleAo3Fandom(this.$(work).find(ParserAo3.SELECTOR_FANDOM));
+    let updated = this.$(work).find(ParserAo3.SELECTOR_UPDATED).text().trim();
 
     let chapters_number: number = 0;
 
     if (Number.isNaN(chapters_released)) {
         Logging.warn(Logging.Source.Crawler, `   Failed to get number of chapters in story ${title}, trying alternative...` )
-        chapters_number = this.getAltChaptersReleased($(work).find('dd.chapters').text());
+        chapters_number = this.getAltChaptersReleased(this.$(work).find('dd.chapters').text());
         if (!chapters_number)
             Logging.error(Logging.Source.Crawler, "  Failure to get number of chapters");
     }
@@ -48,9 +48,9 @@ public getStoryData($: cheerio.CheerioAPI, work: Element): crawl.StoryData {
 }
 
 public getSourceData($: cheerio.CheerioAPI, work: Element): crawl.SourceData {
-    let url = $(work).find(ParserAo3.SELECTOR_URL).attr('href')?.trim();
-    let rating = $(work).find(ParserAo3.SELECTOR_RATING).text().trim().replace(",", "");
-    let updated = $(work).find(ParserAo3.SELECTOR_UPDATED).text().trim();
+    let url = this.$(work).find(ParserAo3.SELECTOR_URL).attr('href')?.trim();
+    let rating = this.$(work).find(ParserAo3.SELECTOR_RATING).text().trim().replace(",", "");
+    let updated = this.$(work).find(ParserAo3.SELECTOR_UPDATED).text().trim();
 
     if (Number.isNaN(rating)) {
         Logging.error(Logging.Source.Parser, '   Rating is NaN');
@@ -88,8 +88,8 @@ getAltChaptersReleased(chapters: string): number {
 public processPage(pageHTML: string): void {
     Logging.info(Logging.Source.Crawler, 'Started processing page');
 
-    const $ = cheerio.load(pageHTML);
-    let works: cheerio.Cheerio<Element> = $('li.work'); // ?, when i put a property here it spits out a type error, may be something to do with mutability
+
+    let works: cheerio.Cheerio<Element> = this.$('li.work'); // ?, when i put a property here it spits out a type error, may be something to do with mutability
 
     if (!works)
         Logging.info(Logging.Source.Crawler, 'Did not get any story in the page');
@@ -97,7 +97,7 @@ public processPage(pageHTML: string): void {
     for (const work of works.toArray()) {
         Logging.info(Logging.Source.Parser, 'Started parsing story...')
         
-        let storyData = this.getStoryData($, work);
+        let storyData = this.getStoryData(work);
         let story_id: number | bigint | null = 0;
 
         if (!(this.doesStoryExist(storyData.title, storyData.author)))
@@ -105,7 +105,7 @@ public processPage(pageHTML: string): void {
         else
             story_id = this.getStoryId(storyData.title, storyData.author);
         
-        let sourceData = this.getSourceData($, work);
+        let sourceData = this.getSourceData(this.$, work);
         if (!(this.doesSourceExist(sourceData.url)))
             this.insertSouceInDatabase(story_id!, sourceData);
     }
@@ -113,15 +113,20 @@ public processPage(pageHTML: string): void {
 
 }
 
-handleAo3Fandom($: cheerio.CheerioAPI, elements: cheerio.Cheerio<Element>): string | null {
-    let filteredFandoms = elements.toArray().filter((el) => $(el).text() !== "Parahumans Series - Wildbow");
+handleAo3Fandom(elements: cheerio.Cheerio<Element>): string | null {
+    let filteredFandoms = elements.toArray().filter((el) => this.$(el).text() !== "Parahumans Series - Wildbow");
 
     if (filteredFandoms[0] === undefined) {
         Logging.error(Logging.Source.Crawler, "Processed non-crossover story.");
         return null;
     }
 
-    return $(filteredFandoms[0]).text().trim();
+    return this.$(filteredFandoms[0]).text().trim();
+}
+
+getAmountOfPages(): number {
+    // cheerio.load()
+    return 0;
 }
 
 }

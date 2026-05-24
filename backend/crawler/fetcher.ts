@@ -1,10 +1,10 @@
 import * as Logging from '../logger';
 
-enum BaseURL {
+export enum BaseURL {
     AO3 = "https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works",
 }
 
-class fetcher {
+export class fetcher {
     baseUrl: string = "";
     dataCurrent: string = "";
 
@@ -13,10 +13,10 @@ class fetcher {
     }
 
     setupScheduledCrawl(delayMiliseconds: number): void { 
-            setInterval(() => this.fetchSite(this.baseUrl), delayMiliseconds) }
+            setInterval(() => this.fetchSite(), delayMiliseconds) }
     
-    async fetchSite(baseUrl: string): Promise<void> {
-            const res = await fetch (`${baseUrl}`);
+    async fetchSite(): Promise<void> {
+            const res = await fetch (`${this.baseUrl}`);
             
             this.dataCurrent = await res.text();
             Logging.info(Logging.Source.Http, "Fetched AO3 page")
