@@ -5,14 +5,14 @@ export enum BaseURL {
 }
 
 export class fetcher {
-    baseUrl: string = "";
-    dataCurrent: string = "";
+    public baseUrl: string = "";
+    public dataCurrent: string = "";
 
     constructor(baseUrl: string) {
         this.baseUrl = baseUrl;
     }
 
-    setupScheduledCrawl(delayMiliseconds: number): void { 
+    private setupScheduledCrawl(delayMiliseconds: number): void { 
             setInterval(() => this.fetchSite(), delayMiliseconds) }
     
     async fetchSite(): Promise<void> {

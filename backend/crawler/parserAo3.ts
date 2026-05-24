@@ -85,7 +85,7 @@ getAltChaptersReleased(chapters: string): number {
     return Number(chapterInfo[0])!;
 }
 
-public processPage(pageHTML: string): void {
+public processPage(): void {
     Logging.info(Logging.Source.Crawler, 'Started processing page');
 
 
@@ -125,8 +125,15 @@ handleAo3Fandom(elements: cheerio.Cheerio<Element>): string | null {
 }
 
 getAmountOfPages(): number {
-    // cheerio.load()
-    return 0;
+    let pageAmountString = this.$('ol.pagination > li:nth-last-child(2) > a').text().trim();
+
+    if (Number.isNaN(pageAmountString)) {
+        Logging.error(Logging.Source.Crawler, 'Failed to get a coherent page amount for bootstraping');
+        return 0;
+    }
+
+    let pageAmount = Number(pageAmountString);
+    return pageAmount;
 }
 
 }

@@ -27,11 +27,10 @@ export type SourceData = {
 export class Parser {
     protected db: Database;
     protected $: cheerio.CheerioAPI;
-    protected pageHtml: string = "";
 
-    constructor(db: Database) {
+    constructor(pageHtml: string, db: Database) {
         this.db = db
-        this.$ = cheerio.load(this.pageHtml);
+        this.$ = cheerio.load(pageHtml);
     }
 
     
