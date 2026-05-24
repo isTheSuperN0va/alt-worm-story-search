@@ -117,7 +117,7 @@ export class Parser {
         const inserted = insert.run(
             story_id,
             data.url,
-            data.rating,
+            data.rating + 1,
             data.updated
         );
 
