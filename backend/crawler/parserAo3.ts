@@ -1,9 +1,9 @@
-import * as crawl from './crawler.ts'
+import * as crawl from './parser.ts'
 import * as Logging from '../logger.ts'
 import * as cheerio from 'cheerio'
 import { Element } from "domhandler";
 
-export class crawlerAo3 extends crawl.crawler {
+export class ParserAo3 extends crawl.Parser {
 
 public delayMiliseconds: number = 1000 * 10;
 
@@ -27,12 +27,12 @@ public static BASE_URL = 'https://archiveofourown.org/tags/Parahumans%20Series%2
 // }
 
 public getStoryData($: cheerio.CheerioAPI, work: Element): crawl.StoryData {
-    let title = $(work).find(crawlerAo3.SELECTOR_TITLE).text().trim();
-    let author = $(work).find(crawlerAo3.SELECTOR_AUTHOR).text().trim();
-    let summaries = $(work).find(crawlerAo3.SELECTOR_SUMMARY).text().trim();
-    let chapters_released = $(work).find(crawlerAo3.SELECTOR_CHAPTERS).text().trim();
-    let fandom = this.handleAo3Fandom($, $(work).find(crawlerAo3.SELECTOR_FANDOM));
-    let updated = $(work).find(crawlerAo3.SELECTOR_UPDATED).text().trim();
+    let title = $(work).find(ParserAo3.SELECTOR_TITLE).text().trim();
+    let author = $(work).find(ParserAo3.SELECTOR_AUTHOR).text().trim();
+    let summaries = $(work).find(ParserAo3.SELECTOR_SUMMARY).text().trim();
+    let chapters_released = $(work).find(ParserAo3.SELECTOR_CHAPTERS).text().trim();
+    let fandom = this.handleAo3Fandom($, $(work).find(ParserAo3.SELECTOR_FANDOM));
+    let updated = $(work).find(ParserAo3.SELECTOR_UPDATED).text().trim();
 
     let chapters_number: number = 0;
 
@@ -48,9 +48,9 @@ public getStoryData($: cheerio.CheerioAPI, work: Element): crawl.StoryData {
 }
 
 public getSourceData($: cheerio.CheerioAPI, work: Element): crawl.SourceData {
-    let url = $(work).find(crawlerAo3.SELECTOR_URL).attr('href')?.trim();
-    let rating = $(work).find(crawlerAo3.SELECTOR_RATING).text().trim().replace(",", "");
-    let updated = $(work).find(crawlerAo3.SELECTOR_UPDATED).text().trim();
+    let url = $(work).find(ParserAo3.SELECTOR_URL).attr('href')?.trim();
+    let rating = $(work).find(ParserAo3.SELECTOR_RATING).text().trim().replace(",", "");
+    let updated = $(work).find(ParserAo3.SELECTOR_UPDATED).text().trim();
 
     if (Number.isNaN(rating)) {
         Logging.error(Logging.Source.Parser, '   Rating is NaN');

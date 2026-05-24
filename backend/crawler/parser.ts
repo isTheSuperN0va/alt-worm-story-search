@@ -24,7 +24,7 @@ export type SourceData = {
     updated: string 
 }
 
-export class crawler {
+export class Parser {
     protected db: Database;
     public dataCurrent: string = "";
 
@@ -46,13 +46,13 @@ export class crawler {
         let data: string[] = [];
 
         if ($(selector) === undefined) {
-            Logging.error(Logging.Source.Crawler, `Failed to get page element ${label} with jQuery`);
+            Logging.error(Logging.Source.Parser, `Failed to get page element ${label} with jQuery`);
             return;
         }
 
         data = $(selector).map((_, el) => $(el).text().trim()).get(); 
         
-        if (selector === 'dd.chapters > a') for (const datai of data) Logging.info(Logging.Source.Crawler, datai);
+        if (selector === 'dd.chapters > a') for (const datai of data) Logging.info(Logging.Source.Parser, datai);
 
         return data!;
     }
