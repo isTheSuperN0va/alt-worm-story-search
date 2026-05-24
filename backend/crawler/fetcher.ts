@@ -15,8 +15,8 @@ export class fetcher {
     private setupScheduledCrawl(delayMiliseconds: number): void { 
             setInterval(() => this.fetchSite(), delayMiliseconds) }
     
-    async fetchSite(): Promise<void> {
-            const res = await fetch (`${this.baseUrl}`);
+    async fetchSite(suffix?: string): Promise<void> {
+            const res = await fetch (this.baseUrl + suffix);
             
             this.dataCurrent = await res.text();
             Logging.info(Logging.Source.Http, "Fetched AO3 page")

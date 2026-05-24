@@ -88,8 +88,6 @@ getAltChaptersReleased(chapters: string): number {
 
 public processPage(): void {
     Logging.info(Logging.Source.Crawler, 'Started processing page');
-
-
     let works: cheerio.Cheerio<Element> = this.$('li.work'); // ?, when i put a property here it spits out a type error, may be something to do with mutability
 
     if (!works)
@@ -126,8 +124,8 @@ handleAo3Fandom(elements: cheerio.Cheerio<Element>): string | null {
 }
 
 getAmountOfPages(): number {
-    let pageAmountString = this.$('ol.pagination > li:nth-last-child(2) > a:first-child').first().text();
-
+    let pageAmountString = this.$('ol.pagination > li:nth-last-child(2)').first().text();
+    console.log(this.$('ol.pagination > li:nth-last-child(2) > a:first-child').text());
 
     if (Number.isNaN(pageAmountString)) {
         Logging.error(Logging.Source.Crawler, 'Failed to get a coherent page amount for bootstraping');
@@ -136,7 +134,6 @@ getAmountOfPages(): number {
 
     let pageAmount = Number(pageAmountString);
     Logging.info(Logging.Source.Crawler, `Successfuly acquired page amount, string: ${pageAmountString}, number: ${pageAmount}`);
-    sleep(10000);
     return pageAmount;
 }
 
