@@ -113,13 +113,13 @@ export class Parser {
 
         if (this.isVerbose) Logging.info(Logging.Source.Database, `
             Inserting source;
-            url: ${BaseURL.AO3}${data.url};
+            url: https://archiveofourown.org${data.url};
             rating: ${data.rating};
             updated: ${data.updated};`)
 
         const inserted = insert.run(
             story_id,
-            data.url,
+            'https://archiveofourown.org' + data.url,
             data.rating + 1,
             data.updated
         );
