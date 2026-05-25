@@ -18,7 +18,7 @@ export async function bootstrap(db: Database) {
 
     for (let i = 2; i <= pageAmount; i++) {
         ao3Fetcher.fetchSite(`?page=${i}`);
-        ao3Parser = new parser.ParserAo3(ao3Fetcher.dataCurrent, db, false);
+        ao3Parser = new parser.ParserAo3(ao3Fetcher.dataCurrent, db, true);
         ao3Parser.processPage()
 
         percentageComplete = i / pageAmount;

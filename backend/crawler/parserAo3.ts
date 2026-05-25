@@ -3,6 +3,8 @@ import * as Logging from '../logger.ts'
 import * as cheerio from 'cheerio'
 import { Element } from "domhandler";
 import { sleep } from 'bun';
+import * as fetcher from './fetcher.ts'
+
 
 export class ParserAo3 extends crawl.Parser {
 
@@ -31,18 +33,21 @@ public getStoryData(work: Element): crawl.StoryData {
     let title = this.$(work).find(ParserAo3.SELECTOR_TITLE).text().trim();
     let author = this.$(work).find(ParserAo3.SELECTOR_AUTHOR).text().trim();
     let summaries = this.$(work).find(ParserAo3.SELECTOR_SUMMARY).text().trim();
-    let chapters_released = this.$(work).find(ParserAo3.SELECTOR_CHAPTERS).text().trim();
+    let chapters_released = this.$(work).find('dd.chapters > a').first().text();
     let fandom = this.handleAo3Fandom(this.$(work).find(ParserAo3.SELECTOR_FANDOM));
     let updated = this.$(work).find(ParserAo3.SELECTOR_UPDATED).text().trim();
 
     let chapters_number: number = 0;
 
-    if (Number.isNaN(chapters_released)) {
+    if (Number.isNaN(Number(chapters_released))) {
         Logging.warn(Logging.Source.Crawler, `   Failed to get number of chapters in story ${title}, trying alternative...` )
-        chapters_number = this.getAltChaptersReleased(this.$(work).find('dd.chapters').text());
+        chapters_number = this.getAltChaptersReleased(this.$(work).find('dd.chapters').first().text());
         if (!chapters_number)
             Logging.error(Logging.Source.Crawler, "  Failure to get number of chapters");
     }
+
+    chapters_number = Number(chapters_released)
+
     let data: crawl.StoryData = this.createStoryData(title, author, summaries, chapters_number, updated, fandom);
     return data;
 
@@ -53,7 +58,7 @@ public getSourceData($: cheerio.CheerioAPI, work: Element): crawl.SourceData {
     let rating = this.$(work).find(ParserAo3.SELECTOR_RATING).text().trim().replace(",", "");
     let updated = this.$(work).find(ParserAo3.SELECTOR_UPDATED).text().trim();
 
-    if (Number.isNaN(rating)) {
+    if (Number.isNaN(Number(rating))) {
         Logging.error(Logging.Source.Parser, '   Rating is NaN');
     }
 
@@ -138,3 +143,5 @@ getAmountOfPages(): number {
 }
 
 }
+
+debugger;
