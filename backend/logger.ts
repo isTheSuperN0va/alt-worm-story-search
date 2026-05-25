@@ -11,27 +11,6 @@ export enum Type {
     Info = "\x1b[34mInfo\x1b[0m"
 }
 
-function formatMessage(message: string): string {
-    const lastChar = message[message.length - 1];
-
-    if (lastChar == ".")
-        message.replace(".", ";");
-
-    if (lastChar != ";")
-        message += ";";
-
-    return message;
-}
-
-export function error(source: Source, message: string) {
-    let formattedMessage = formatMessage(message); 
-    console.log(`${new Date().toISOString()} - [${source}/${Type.Error}]: ${formattedMessage}`); 
-}
-export function info(source: Source, message: string) {
-    let formattedMessage = formatMessage(message); 
-    console.log(` ${new Date().toISOString()} - [${source}/${Type.Info}]:  ${formattedMessage}`);
-}
-export function warn(source: Source, message: string) {
-    let formattedMessage = formatMessage(message); 
-    console.log(`${new Date().toISOString()} - [${source}/${Type.Warning}]: ${formattedMessage}`);
-}
+export function error(source: Source, message: string) { console.log(`${new Date().toISOString()} - [${source}/${Type.Error}]: ${message}`); }
+export function info(source: Source, message: string) { console.log(` ${new Date().toISOString()} - [${source}/${Type.Info}]:  ${message}`);}
+export function warn(source: Source, message: string) { console.log(`${new Date().toISOString()} - [${source}/${Type.Warning}]: ${message}`);}
