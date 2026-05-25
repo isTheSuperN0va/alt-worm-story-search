@@ -2,6 +2,7 @@ import * as cheerio from 'cheerio'
 import { Element } from "domhandler";
 import { Database } from 'bun:sqlite'
 import * as Logging from '../logger'
+import { BaseURL } from './fetcher';
 
 const ao3Url: string = "https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works";
 
@@ -112,7 +113,7 @@ export class Parser {
 
         if (this.isVerbose) Logging.info(Logging.Source.Database, `
             Inserting source;
-            url: ${data.url};
+            url: ${BaseURL.AO3}${data.url};
             rating: ${data.rating};
             updated: ${data.updated};`)
 

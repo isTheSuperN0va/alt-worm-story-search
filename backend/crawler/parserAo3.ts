@@ -116,7 +116,7 @@ handleAo3Fandom(elements: cheerio.Cheerio<Element>): string | null {
     let filteredFandoms = elements.toArray().filter((el) => this.$(el).text() !== "Parahumans Series - Wildbow");
 
     if (filteredFandoms[0] === undefined) {
-        Logging.error(Logging.Source.Crawler, "Processed non-crossover story.");
+        Logging.info(Logging.Source.Crawler, "Processed non-crossover story.");
         return null;
     }
 
@@ -128,12 +128,12 @@ getAmountOfPages(): number {
     console.log(this.$('ol.pagination > li:nth-last-child(2) > a:first-child').text());
 
     if (Number.isNaN(pageAmountString)) {
-        Logging.error(Logging.Source.Crawler, 'Failed to get a coherent page amount for bootstraping');
+        Logging.error(Logging.Source.Parser, 'Failed to get a coherent page amount for bootstraping');
         return 0;
     }
 
     let pageAmount = Number(pageAmountString);
-    Logging.info(Logging.Source.Crawler, `Successfuly acquired page amount, string: ${pageAmountString}, number: ${pageAmount}`);
+    Logging.info(Logging.Source.Parser, `Successfuly acquired page amount, string: ${pageAmountString}, number: ${pageAmount}`);
     return pageAmount;
 }
 
