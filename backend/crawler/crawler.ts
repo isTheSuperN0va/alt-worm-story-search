@@ -8,7 +8,7 @@ import { sleep } from 'bun';
 export async function bootstrap(db: Database) {
     let ao3Fetcher = new fetcher.fetcher(fetcher.BaseURL.AO3);
     await ao3Fetcher.fetchSite("");
-    let ao3Parser = new parser.ParserAo3(ao3Fetcher.dataCurrent, db);
+    let ao3Parser = new parser.ParserAo3(ao3Fetcher.dataCurrent, db, false);
     let pageAmount: number = ao3Parser.getAmountOfPages();
 
     if (pageAmount === 0) return;
@@ -18,7 +18,7 @@ export async function bootstrap(db: Database) {
 
     for (let i = 2; i <= pageAmount; i++) {
         ao3Fetcher.fetchSite(`?page=${i}`);
-        ao3Parser = new parser.ParserAo3(ao3Fetcher.dataCurrent, db);
+        ao3Parser = new parser.ParserAo3(ao3Fetcher.dataCurrent, db, false);
         ao3Parser.processPage()
 
         percentageComplete = i / pageAmount;

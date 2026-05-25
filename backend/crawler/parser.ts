@@ -27,10 +27,12 @@ export type SourceData = {
 export class Parser {
     protected db: Database;
     protected $: cheerio.CheerioAPI;
+    protected isVerbose: boolean = true;
 
-    constructor(pageHtml: string, db: Database) {
+    constructor(pageHtml: string, db: Database, isVerbose: boolean) {
         this.db = db
         this.$ = cheerio.load(pageHtml);
+        this.isVerbose = isVerbose;
     }
 
     
@@ -81,7 +83,7 @@ export class Parser {
         (title, author, summary, chapters_released, updated, fandom) 
         VALUES (?, ?, ?, ?, ?, ?)`);
 
-        Logging.info(Logging.Source.Database, `
+        if (this.isVerbose) Logging.info(Logging.Source.Database, `
             Inserting story;
             title: ${data.title};
             author: ${data.author};
@@ -108,7 +110,7 @@ export class Parser {
         (story_id, url, rating, updated)
         VALUES (?, ?, ?, ?)`);
 
-        Logging.info(Logging.Source.Database, `
+        if (this.isVerbose) Logging.info(Logging.Source.Database, `
             Inserting source;
             url: ${data.url};
             rating: ${data.rating};
