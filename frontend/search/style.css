@@ -18,16 +18,40 @@ body {
 
 table {
     width: 100vw;
+    table-layout: fixed;
 }
 
-#header > th {
+tbody > tr:first-child > td {
+    border-top: 1px solid gold;
+}
+
+td, th {
+    overflow-wrap: break-word;
+}
+
+
+
+th {
     height: 40px;
+    resize: horizontal;
     position: sticky;
     top: 0;
 }
 
-.tableData > td {
+td {
     height: 40px;
     background-color: var(--bg);
     padding: 10px;
+}
+
+#titleHeader    { width: 35%; }
+#authorHeader   { width: 10%; }
+#chaptersHeader { width: 4%; }
+#updatedHeader  { width: 25%; }
+#fandomHeader   { width: 25%; }
+
+.centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
