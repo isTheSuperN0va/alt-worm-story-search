@@ -29,13 +29,19 @@ public static BASE_URL = 'https://archiveofourown.org/tags/Parahumans%20Series%2
 //     this.setupScheduledCrawl(this.delayMiliseconds)
 // }
 
+public textBySelector(element: cheerio.Cheerio<Element>, selector: string) {
+    return element.find(selector).text().trim()
+}
+
 public getStoryData(work: Element): crawl.StoryData {
-    let title = this.$(work).find(ParserAo3.SELECTOR_TITLE).text().trim();
-    let author = this.$(work).find(ParserAo3.SELECTOR_AUTHOR).text().trim();
-    let summaries = this.$(work).find(ParserAo3.SELECTOR_SUMMARY).text().trim();
-    let chapters_released = this.$(work).find('dd.chapters > a').first().text();
-    let fandom = this.handleAo3Fandom(this.$(work).find(ParserAo3.SELECTOR_FANDOM));
-    let updated = this.$(work).find(ParserAo3.SELECTOR_UPDATED).text().trim();
+    let wElement = this.$(work); 
+
+    let title = this.formatTitle(this.textBySelector(wElement, ParserAo3.SELECTOR_TITLE));
+    let author = this.textBySelector(wElement, ParserAo3.SELECTOR_AUTHOR);
+    let summaries = this.textBySelector(wElement, ParserAo3.SELECTOR_SUMMARY);
+    let chapters_released = this.textBySelector(wElement, 'dd.chapters > a');
+    let fandom = this.handleAo3Fandom(wElement.find(ParserAo3.SELECTOR_FANDOM));
+    let updated = this.textBySelector(wElement, ParserAo3.SELECTOR_UPDATED);
 
     let chapters_number: number = 0;
 
@@ -48,7 +54,7 @@ public getStoryData(work: Element): crawl.StoryData {
 
     chapters_number = Number(chapters_released)
 
-    let data: crawl.StoryData = this.createStoryData(title, author, summaries, chapters_number, updated, fandom);
+    let data: crawl.StoryData = this.createStoryData(title!, author, summaries, chapters_number, updated, fandom);
     return data;
 
 }
@@ -140,6 +146,14 @@ getAmountOfPages(): number {
     let pageAmount = Number(pageAmountString);
     Logging.info(Logging.Source.Parser, `Successfuly acquired page amount, string: ${pageAmountString}, number: ${pageAmount}`);
     return pageAmount;
+}
+
+formatTitle(title: string) {
+    let parenthesisIndex = title.search(/(\()\w+\\\//);
+    let substringToRemove = title.slice(parenthesisIndex);
+    let formattedTitle = title.split(substringToRemove)[0]?.trim();
+
+    return formattedTitle;
 }
 
 }
