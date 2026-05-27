@@ -5,10 +5,14 @@ import * as crawler from './crawler/crawler.ts';
 const db = new Database("./database/wormindex.db");
 const portNumber = 3000;
 
+type StoriesRequest = {
+    amount: number
+}
+
 Bun.serve({
 
     port: portNumber,
-    fetch(req) {
+    async fetch(req) {
         const url = new URL(req.url);
 
 
@@ -48,7 +52,15 @@ Bun.serve({
                     }
                 })
             case "/api/stories":
-                const stories = db.query("SELECT * FROM stories LIMIT 40").all();
+                const data = await req.json() as StoriesRequest;
+                
+                const query = db.query(`
+                    SELECT *
+                    FROM stories
+                    INNER JOIN sources
+                    ON stories.id = sources.story_id
+                    LIMIT ?`);
+                const stories = query.all(data.amount);
                 return Response.json(stories);
             default:
                 return new Response("404", { status: 404 })

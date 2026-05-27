@@ -134,6 +134,15 @@ handleAo3Fandom(elements: cheerio.Cheerio<Element>): string | null {
     return this.$(filteredFandoms[0]).text().trim();
 }
 
+static formatAo3Fandom(fandom: string) {
+    let formattedFandom = fandom.split('|')
+
+    if (formattedFandom.length == 2)
+        return formattedFandom[1]?.trim();
+
+    return formattedFandom[0];
+}
+
 getAmountOfPages(): number {
     let pageAmountString = this.$('ol.pagination > li:nth-last-child(2)').first().text();
     console.log(this.$('ol.pagination > li:nth-last-child(2) > a:first-child').text());

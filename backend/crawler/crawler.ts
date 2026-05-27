@@ -29,7 +29,7 @@ export async function bootstrap(db: Database) {
 }
 
 //TODO
-// *Remover parenteses em autor, titulos
+// *Remover parenteses em autor, titulos ok
 // *Remover '|' das fandoms (priorizar direita)
 // *Remover 'Original Work' e outros de fandom
 // *url em source deve ser unico
