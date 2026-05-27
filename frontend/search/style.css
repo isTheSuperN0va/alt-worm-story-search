@@ -44,6 +44,10 @@ td {
     padding: 10px;
 }
 
+td > span {
+    margin-right: 0.3em;
+}
+
 #titleHeader    { width: 35%; }
 #authorHeader   { width: 10%; }
 #chaptersHeader { width: 4%; }

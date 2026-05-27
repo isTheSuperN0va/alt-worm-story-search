@@ -1,10 +1,28 @@
-fetch("/api/stories").then((res) => res.json()).then(data => addDataToTable(data));
+const data = await getStories();
+attachSources(data, "AO3");
 
-const table = document.getElementById("tableBody")
+async function getStories() {
+    const stories = await fetch("/api/stories", {
+    method: 'POST',
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        amount: 50, 
+    })
+    });
+
+    const data = await stories.json();
+    addDataToTable(data)
+    return data;
+}
+
 
 function addDataToTable(data) {
+    let table = document.getElementById("tableBody")
+
     for (const row of data) {
-        tableRow = document.createElement("tr");
+        let tableRow = document.createElement("tr");
         tableRow.classList.add("tableData");
 
         let title = createTableCell(row.title, "titleData", false);    
@@ -33,5 +51,41 @@ function createTableCell(data, className, centered) {
     if (centered) cellSpan.classList.add("centered")
     
     return cell;
+}
+
+function attachSources(data, label) {
+    const titleCells = document.getElementsByClassName("titleData")
+    console.log(data[0])
+
+    const cellsArray = Array.from(titleCells);
+
+    let i = 0;
+
+    for (const cell of cellsArray) {
+        appendNewLabel(cell, data[i].url, label)
+
+        // this should work for when there are more than 1 source for a story
+        if (i > 1) {
+            let storyId = data[i].story_id;
+            let prevStoryId = data[i - 1].story_id;
+
+            while (storyId === prevStoryId) {
+                appendNewLabel(cell, data[i].url, label)                
+                i++;                
+            }
+        }
+        
+        i++;
+    }
+}
+
+function appendNewLabel(cell, url, label) {
+    let aElement = document.createElement("a");
+    aElement.setAttribute("href", url);
+    aElement.setAttribute("target", "_blank");
+
+    aElement.textContent = label;
+    aElement.classList.add("sourceLabel")
+    cell.appendChild(aElement)
 }
 
