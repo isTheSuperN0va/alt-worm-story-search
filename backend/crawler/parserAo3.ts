@@ -24,6 +24,12 @@ private static SELECTOR_RATING = 'dd.kudos > a';
 
 public static BASE_URL = 'https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works';
 
+private static FANDOM_BLACKLIST = [
+    "Parahumans Series - Wildbow",
+    "Worm",
+    "Original Work"
+]
+
 // setupCrawling() {
 //     let response: JSON;
 //     this.setupScheduledCrawl(this.delayMiliseconds)
@@ -124,7 +130,7 @@ public processPage(): void {
 }
 
 handleAo3Fandom(elements: cheerio.Cheerio<Element>): string | null {
-    let filteredFandoms = elements.toArray().filter((el) => this.$(el).text() !== "Parahumans Series - Wildbow");
+    let filteredFandoms = elements.toArray().filter((el) => !ParserAo3.FANDOM_BLACKLIST.includes(this.$(el).text()));
 
     if (filteredFandoms[0] === undefined) {
         Logging.info(Logging.Source.Crawler, "Processed non-crossover story.");
