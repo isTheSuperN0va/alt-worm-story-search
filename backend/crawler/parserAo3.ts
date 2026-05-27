@@ -137,16 +137,27 @@ handleAo3Fandom(elements: cheerio.Cheerio<Element>): string | null {
         return null;
     }
 
-    return this.$(filteredFandoms[0]).text().trim();
+    return this.formatAo3Fandom(this.$(filteredFandoms[0]).text().trim());
 }
 
-static formatAo3Fandom(fandom: string) {
+formatAo3Fandom(fandom: string) {
     let formattedFandom = fandom.split('|')
 
-    if (formattedFandom.length == 2)
-        return formattedFandom[1]?.trim();
+    if (formattedFandom == null) {
+        Logging.error(Logging.Source.Parser, "Formatting fandom name failed: returned null");
+        return "ERROR";
+    }
 
-    return formattedFandom[0];
+    if (formattedFandom == undefined) {
+        Logging.error(Logging.Source.Parser, "Formatting fandom name failed: returned undefined");
+        return "ERROR";
+
+    }
+
+    if (formattedFandom.length == 2)
+        return formattedFandom[1]!.trim();
+
+    return formattedFandom[0]!;
 }
 
 getAmountOfPages(): number {
@@ -164,9 +175,7 @@ getAmountOfPages(): number {
 }
 
 formatTitle(title: string) {
-    let parenthesisIndex = title.search(/(\()\w+\\\//);
-    let substringToRemove = title.slice(parenthesisIndex);
-    let formattedTitle = title.split(substringToRemove)[0]?.trim();
+    let formattedTitle = title.replace(/(\()((\w+\\\w+)|\w+|\w+\\)(\))/, "").trim();
 
     return formattedTitle;
 }

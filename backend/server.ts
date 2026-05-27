@@ -72,6 +72,6 @@ Bun.serve({
 })
 
 console.log(`Listening on port ${portNumber}.`)
-// crawler.bootstrap(db)
+crawler.bootstrap(db)
 // await ao3Crawler.fetchSite(cAo3.ParserAo3.BASE_URL);
 // ao3Crawler.processPage();
