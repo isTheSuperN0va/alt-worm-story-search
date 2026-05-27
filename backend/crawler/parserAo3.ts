@@ -122,6 +122,7 @@ public processPage(): void {
             story_id = this.getStoryId(storyData.title, storyData.author);
         
         let sourceData = this.getSourceData(this.$, work);
+
         if (!(this.doesSourceExist(sourceData.url)))
             this.insertSouceInDatabase(story_id!, sourceData);
     }

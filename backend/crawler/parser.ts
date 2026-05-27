@@ -69,8 +69,10 @@ export class Parser {
     }
 
     createSourceData(url: string, rating: number, updated: string) {
+        let fullUrl = 'https://archiveofourown.org' + url + '/navigate'
+        
         let sourceData: SourceData = {
-            url: url,
+            url: fullUrl,
             rating: rating,
             updated: updated
         }
@@ -113,13 +115,13 @@ export class Parser {
 
         if (this.isVerbose) Logging.info(Logging.Source.Database, `
             Inserting source;
-            url: https://archiveofourown.org${data.url};
+            url: ${data.url};
             rating: ${data.rating};
             updated: ${data.updated};`)
 
         const inserted = insert.run(
             story_id,
-            'https://archiveofourown.org' + data.url,
+            data.url,
             data.rating + 1,
             data.updated
         );
