@@ -33,7 +33,7 @@ function addDataToTable(data) {
         let title = createTableCell(row.title, "titleData", false);    
         let author = createTableCell(row.author, "authorData", false);
         let chapters = createTableCell(row.chapters_released, "chaptersData", true);
-        let wordcount = createTableCell(row.wordcount, "wordcountData", true);
+        let wordcount = createTableCell(humanWordcount(row.wordcount), "wordcountData", true);
         let fandom = createTableCell(row.fandom, "fandomData", false);
 
         tableRow.appendChild(updated);
@@ -137,4 +137,19 @@ function humanMinutes(deltaMinutes) {
         return "Just Now";
 
     return `${deltaMinutes} minutes ago`
+}
+
+function humanWordcount(wordcount) {
+    let wordcountNumber = Number(wordcount);
+
+    if (wordcount >= 1000 && wordcount < 1000000) {
+        wordcountNumber = Math.floor(wordcountNumber / 1000);
+        wordcount = String(wordcountNumber) + "k";
+    }
+    if (wordcount >= 1000000) {
+        wordcountNumber = Math.floor(wordcountNumber / 1000000.0);
+        wordcount = String(wordcountNumber) + "m";
+    }
+
+    return wordcount
 }
