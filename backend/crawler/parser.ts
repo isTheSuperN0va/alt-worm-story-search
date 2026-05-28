@@ -84,7 +84,7 @@ export class Parser {
 
     insertStoryInDatabase(data: StoryData): number | bigint {
         const insert = this.db.query(`INSERT INTO stories 
-        (title, author, summary, chapters, updated, fandom, wordcount) 
+        (title, author, summary, chapters, wordcount, updated, fandom) 
         VALUES (?, ?, ?, ?, ?, ?, ?)`);
 
         if (this.isVerbose) Logging.info(Logging.Source.Database, `
@@ -92,9 +92,10 @@ export class Parser {
             title: ${data.title};
             author: ${data.author};
             chapters: ${data.chapters_released};
+            wordcount: ${data.wordcount};
             updated: ${data.updated};
             fandom: ${data.fandom ?? "None"};
-            wordcount: ${data.wordcount}`);
+            `);
 
         const inserted = insert.run
         (
@@ -102,9 +103,9 @@ export class Parser {
             data.author,
             data.summary,
             data.chapters_released,
+            data.wordcount,
             data.updated,
             data.fandom,
-            data.wordcount
         );
 
         Logging.info(Logging.Source.Database, "  Success");

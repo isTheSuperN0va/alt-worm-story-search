@@ -112,7 +112,7 @@ function humanDate(datetime) {
     const deltaDays = Math.floor(deltaHours / HOURS_IN_DAY);
 
     if (deltaDays == 0)
-        humanHours(deltaHours, deltaMinutes);
+        return humanHours(deltaHours, deltaMinutes);
 
     if (deltaDays == 1)
         return "Yesterday"
@@ -129,7 +129,7 @@ function humanHours(deltaHours, deltaMinutes) {
         return humanMinutes(deltaMinutes); 
     }
         
-    return `${hoursAgo} hours ago`;
+    return `${deltaHours} hours ago`;
 }
 
 function humanMinutes(deltaMinutes) {
