@@ -34,7 +34,7 @@ function addDataToTable(data) {
         tableRow.appendChild(title);
         tableRow.appendChild(author);
         tableRow.appendChild(chapters);
-        tableRow.appendChild(updated);
+        tableRow.appendChild(wordcount);
         tableRow.appendChild(fandom);
 
         table.appendChild(tableRow)
@@ -53,7 +53,7 @@ function createTableCell(data, className, centered) {
     return cell;
 }
 
-function attachSources(data, label) {
+function attachSources(data, imgUrl) {
     const titleCells = document.getElementsByClassName("titleData")
     console.log(data[0])
 
@@ -62,7 +62,7 @@ function attachSources(data, label) {
     let i = 0;
 
     for (const cell of cellsArray) {
-        appendNewLabel(cell, data[i].url, label)
+        appendNewLabel(cell, data[i].url, imgUrl)
 
         // this should work for when there are more than 1 source for a story
         if (i > 1) {
@@ -79,13 +79,18 @@ function attachSources(data, label) {
     }
 }
 
-function appendNewLabel(cell, url, label) {
+function appendNewLabel(cell, url, imgUrl) {
     let aElement = document.createElement("a");
+    let imgElement = document.createElement("img");
+
     aElement.setAttribute("href", url);
     aElement.setAttribute("target", "_blank");
+    aElement.classList.add("source")
 
-    aElement.textContent = label;
-    aElement.classList.add("sourceLabel")
+    imgElement.setAttribute("src", imgUrl);
+
+    
+    aElement.appendChild(imgElement)
     cell.appendChild(aElement)
 }
 
