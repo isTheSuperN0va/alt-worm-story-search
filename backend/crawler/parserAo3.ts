@@ -48,6 +48,7 @@ public getStoryData(work: Element): crawl.StoryData {
     let chapters_released = this.textBySelector(wElement, 'dd.chapters > a');
     let fandom = this.handleAo3Fandom(wElement.find(ParserAo3.SELECTOR_FANDOM));
     let updated = this.textBySelector(wElement, ParserAo3.SELECTOR_UPDATED);
+    let wordcount = Number(this.textBySelector(wElement, 'dd.words').replace(",", "."));
 
     let chapters_number: number = 0;
 
@@ -60,7 +61,7 @@ public getStoryData(work: Element): crawl.StoryData {
 
     chapters_number = Number(chapters_released)
 
-    let data: crawl.StoryData = this.createStoryData(title!, author, summaries, chapters_number, updated, fandom);
+    let data: crawl.StoryData = this.createStoryData(title!, author, summaries, chapters_number, updated, fandom, wordcount);
     return data;
 
 }

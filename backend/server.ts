@@ -62,6 +62,12 @@ Bun.serve({
                     LIMIT ?`);
                 const stories = query.all(data.amount);
                 return Response.json(stories);
+            case "/source/ao3":
+                return new Response(Bun.file("../frontend/search/icon/ao3_source.png"), {
+                    headers: {
+                        "Content-Type": "image/png"
+                    }
+                });
             default:
                 return new Response("404", { status: 404 })
         }

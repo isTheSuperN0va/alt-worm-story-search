@@ -13,7 +13,7 @@ export type StoryData = {
     chapters_released: number,
     updated: string,
     fandom: string | null,
-
+    wordcount: number
     // url: string,
     // kudos: number,
     // wordcount: number
@@ -53,7 +53,7 @@ export class Parser {
         return data!;
     }
 
-    createStoryData(title: string, author: string, summary: string, chapters_released: number, updated: string, fandom: string | null): StoryData {
+    createStoryData(title: string, author: string, summary: string, chapters_released: number, updated: string, fandom: string | null, wordcount: number): StoryData {
         let storyData: StoryData = {
             title: title,
             author: author,
@@ -61,6 +61,7 @@ export class Parser {
             chapters_released: chapters_released,
             updated: updated,
             fandom: fandom,
+            wordcount: wordcount
         }
 
         Logging.info(Logging.Source.Parser, `    Created StoryData for ${storyData.title}`);
@@ -83,8 +84,8 @@ export class Parser {
 
     insertStoryInDatabase(data: StoryData): number | bigint {
         const insert = this.db.query(`INSERT INTO stories 
-        (title, author, summary, chapters_released, updated, fandom) 
-        VALUES (?, ?, ?, ?, ?, ?)`);
+        (title, author, summary, chapters, updated, fandom, wordcount) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)`);
 
         if (this.isVerbose) Logging.info(Logging.Source.Database, `
             Inserting story;
@@ -92,7 +93,8 @@ export class Parser {
             author: ${data.author};
             chapters: ${data.chapters_released};
             updated: ${data.updated};
-            fandom: ${data.fandom ?? "None"};`);
+            fandom: ${data.fandom ?? "None"};
+            wordcount: ${data.wordcount}`);
 
         const inserted = insert.run
         (
@@ -101,7 +103,8 @@ export class Parser {
             data.summary,
             data.chapters_released,
             data.updated,
-            data.fandom
+            data.fandom,
+            data.wordcount
         );
 
         Logging.info(Logging.Source.Database, "  Success");
