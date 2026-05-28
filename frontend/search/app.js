@@ -1,5 +1,9 @@
+const MILISECONDS_IN_MINUTE = 60000;
+const MINUTES_IN_HOUR = 60;
+const HOURS_IN_DAY = 24;
+
 const data = await getStories();
-attachSources(data, "AO3");
+attachSources(data, "source/ao3");
 
 async function getStories() {
     const stories = await fetch("/api/stories", {
@@ -25,12 +29,14 @@ function addDataToTable(data) {
         let tableRow = document.createElement("tr");
         tableRow.classList.add("tableData");
 
+        let updated = createTableCell(humanDate(row.updated), "updatedData", false);
         let title = createTableCell(row.title, "titleData", false);    
         let author = createTableCell(row.author, "authorData", false);
         let chapters = createTableCell(row.chapters_released, "chaptersData", true);
-        let updated = createTableCell(row.updated, "updatedData", false);
+        let wordcount = createTableCell(row.wordcount, "wordcountData", true);
         let fandom = createTableCell(row.fandom, "fandomData", false);
 
+        tableRow.appendChild(updated);
         tableRow.appendChild(title);
         tableRow.appendChild(author);
         tableRow.appendChild(chapters);
@@ -55,7 +61,6 @@ function createTableCell(data, className, centered) {
 
 function attachSources(data, imgUrl) {
     const titleCells = document.getElementsByClassName("titleData")
-    console.log(data[0])
 
     const cellsArray = Array.from(titleCells);
 
@@ -70,7 +75,7 @@ function attachSources(data, imgUrl) {
             let prevStoryId = data[i - 1].story_id;
 
             while (storyId === prevStoryId) {
-                appendNewLabel(cell, data[i].url, label)                
+                appendNewLabel(cell, data[i].url, imgUrl)                
                 i++;                
             }
         }
@@ -94,3 +99,42 @@ function appendNewLabel(cell, url, imgUrl) {
     cell.appendChild(aElement)
 }
 
+function humanDate(datetime) {
+
+
+    let target = new Date(datetime);
+    let now = new Date()
+
+    const deltaMiliseconds = now - target;
+
+    const deltaMinutes = Math.floor(deltaMiliseconds / MILISECONDS_IN_MINUTE);
+    const deltaHours = Math.floor(deltaMinutes / MINUTES_IN_HOUR);
+    const deltaDays = Math.floor(deltaHours / HOURS_IN_DAY);
+
+    if (deltaDays == 0)
+        humanHours(deltaHours, deltaMinutes);
+
+    if (deltaDays == 1)
+        return "Yesterday"
+
+    if (deltaDays <= 14)
+        return `${deltaDays} days ago`
+
+    return datetime;
+}
+
+function humanHours(deltaHours, deltaMinutes) {
+
+    if (deltaHours == 0) {
+        return humanMinutes(deltaMinutes); 
+    }
+        
+    return `${hoursAgo} hours ago`;
+}
+
+function humanMinutes(deltaMinutes) {
+    if (deltaMinutes == 0)
+        return "Just Now";
+
+    return `${deltaMinutes} minutes ago`
+}

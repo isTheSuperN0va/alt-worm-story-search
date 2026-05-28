@@ -5,6 +5,8 @@
 
     --text: hsl(0, 0%, 95%);
 
+    --highlight: hsl(42, 75%, 56%);
+
 }
 
 body {
@@ -14,18 +16,25 @@ body {
 
     margin: 0;
     padding: 0;
+
+    font-family: 'Times New Roman', Times, serif
 }
 
 table {
     width: 100vw;
     table-layout: fixed;
+    border-collapse: collapse;
 }
 
-tbody > tr:first-child > td {
-    border-top: 1px solid gold;
+thead {
+    border-top: 2px solid var(--highlight);
 }
 
-td, th {
+tbody {
+    border-bottom: 2px solid var(--highlight)
+}
+
+td, th {   
     overflow-wrap: break-word;
 }
 
@@ -40,7 +49,7 @@ th {
 
 td {
     height: 40px;
-    background-color: var(--bg);
+    /* background-color: var(--dark-bg); */
     padding: 10px;
 }
 
@@ -48,11 +57,20 @@ td > span {
     margin-right: 0.3em;
 }
 
-#titleHeader    { width: 35%; }
-#authorHeader   { width: 10%; }
+tr:hover > td {
+    background-color: var(--bg);
+}
+
+#updatedHeader  { width: 5%; }
+#titleHeader    { width: 15%; }
+#authorHeader   { width: 8%; }
 #chaptersHeader { width: 4%; }
-#updatedHeader  { width: 25%; }
+#wordcountHeader { width: 4%; }
 #fandomHeader   { width: 25%; }
+
+img {
+    width: 24px;
+}
 
 .centered {
     display: flex;
