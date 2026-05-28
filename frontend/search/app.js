@@ -32,7 +32,7 @@ function addDataToTable(data) {
         let updated = createTableCell(humanDate(row.updated), "updatedData", false);
         let title = createTableCell(row.title, "titleData", false);    
         let author = createTableCell(row.author, "authorData", false);
-        let chapters = createTableCell(row.chapters_released, "chaptersData", true);
+        let chapters = createTableCell(row.chapters, "chaptersData", true);
         let wordcount = createTableCell(humanWordcount(row.wordcount), "wordcountData", true);
         let fandom = createTableCell(row.fandom, "fandomData", false);
 
@@ -93,7 +93,7 @@ function appendNewLabel(cell, url, imgUrl) {
     aElement.classList.add("source")
 
     imgElement.setAttribute("src", imgUrl);
-
+    imgElement.setAttribute('title', "AO3");
     
     aElement.appendChild(imgElement)
     cell.appendChild(aElement)
