@@ -34,6 +34,7 @@ function addDataToTable(data) {
         let author = createTableCell(row.author, "authorData", false);
         let chapters = createTableCell(row.chapters, "chaptersData", true);
         let wordcount = createTableCell(humanWordcount(row.wordcount), "wordcountData", true);
+        let rating = createTableCell(row.rating + " ku", "ratingData", true);
         let fandom = createTableCell(row.fandom, "fandomData", false);
 
         tableRow.appendChild(updated);
@@ -41,6 +42,7 @@ function addDataToTable(data) {
         tableRow.appendChild(author);
         tableRow.appendChild(chapters);
         tableRow.appendChild(wordcount);
+        tableRow.appendChild(rating);
         tableRow.appendChild(fandom);
 
         table.appendChild(tableRow)

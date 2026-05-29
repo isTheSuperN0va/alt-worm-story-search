@@ -28,6 +28,7 @@ table {
 
 thead {
     border-top: 2px solid var(--highlight);
+    background-color: var(--bg);
 }
 
 tbody {
@@ -67,6 +68,11 @@ tr:hover > td {
 #chaptersHeader { width: 4%; }
 #wordcountHeader { width: 4%; }
 #fandomHeader   { width: 25%; }
+
+.titleData {
+    font-size: 1.08em;
+    font-weight: 500;
+}
 
 img {
     width: 24px;
