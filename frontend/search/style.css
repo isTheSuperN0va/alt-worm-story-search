@@ -70,8 +70,23 @@ tr:hover > td {
 #fandomHeader   { width: 25%; }
 
 .titleData {
+    text-decoration: underline;
+
     font-size: 1.08em;
     font-weight: 500;
+}
+
+.titleData > span:first-child:hover {
+    cursor: pointer;
+    text-decoration: underline solid var(--highlight);
+}
+
+.ratingData {
+    text-decoration: underline dotted;
+}
+
+.ratingData > span:hover {
+    cursor: pointer;
 }
 
 img {

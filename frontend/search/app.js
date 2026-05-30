@@ -1,3 +1,9 @@
+const Justify = Object.freeze({
+    Left: 0,
+    Right: 1,
+    Center: 2
+})
+
 const MILISECONDS_IN_MINUTE = 60000;
 const MINUTES_IN_HOUR = 60;
 const HOURS_IN_DAY = 24;
