@@ -37,6 +37,7 @@ export abstract class Parser {
     protected abstract readonly SELECTOR_CHAPTERS: string;
     protected abstract readonly SELECTOR_FANDOM: string;
     protected abstract readonly SELECTOR_UPDATED: string;
+    protected abstract readonly SELECTOR_WORDS: string;
 
     protected abstract readonly SELECTOR_URL: string;
     protected abstract readonly SELECTOR_RATING: string;
@@ -56,10 +57,10 @@ export abstract class Parser {
         let title = this.formatTitle(this.textBySelector(wElement, this.SELECTOR_TITLE));
         let author = this.textBySelector(wElement, this.SELECTOR_AUTHOR);
         let summaries = this.textBySelector(wElement, this.SELECTOR_SUMMARY);
-        let chapters_released = this.textBySelector(wElement, 'dd.chapters > a');
+        let chapters_released = this.textBySelector(wElement, this.SELECTOR_CHAPTERS);
         let fandom = this.handleFandom(wElement.find(this.SELECTOR_FANDOM));
         let updated = this.textBySelector(wElement, this.SELECTOR_UPDATED);
-        let wordcount = Number(this.textBySelector(wElement, 'dd.words').replaceAll(",", ""));
+        let wordcount = Number(this.textBySelector(wElement, this.SELECTOR_WORDS).replaceAll(",", ""));
     
     
         let chapters_number: number = 0;

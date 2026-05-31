@@ -18,6 +18,7 @@ protected readonly SELECTOR_SUMMARY: string;
 protected readonly SELECTOR_CHAPTERS: string;
 protected readonly SELECTOR_FANDOM: string;
 protected readonly SELECTOR_UPDATED: string;
+protected readonly SELECTOR_WORDS: string;
 
 protected readonly SELECTOR_URL: string;
 protected readonly SELECTOR_RATING: string;
@@ -40,6 +41,7 @@ constructor(pageHtml: string, db: Database, isVerbose: boolean) {
     this.SELECTOR_CHAPTERS = 'dd.chapters > a';
     this.SELECTOR_FANDOM = 'h5.fandoms > a';
     this.SELECTOR_UPDATED = '.datetime';
+    this.SELECTOR_WORDS = 'dd.words';
 
     this.SELECTOR_URL = 'h4.heading > a:first-child';
     this.SELECTOR_RATING = 'dd.kudos > a';
