@@ -113,6 +113,8 @@ function humanDate(datetime) {
     let target = new Date(datetime);
     let now = new Date()
 
+    target.setMinutes(target.getMinutes() - target.getTimezoneOffset());
+
     const deltaMiliseconds = now - target;
 
     const deltaMinutes = Math.floor(deltaMiliseconds / MILISECONDS_IN_MINUTE);
