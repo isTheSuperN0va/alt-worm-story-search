@@ -25,10 +25,21 @@ export type SourceData = {
     updated: string 
 }
 
-export class Parser {
+export abstract class Parser {
     protected db: Database;
     protected $: cheerio.CheerioAPI;
     protected isVerbose: boolean = true;
+
+    protected abstract readonly SELECTOR_WORKS: string;
+    protected abstract readonly SELECTOR_TITLE: string;
+    protected abstract readonly SELECTOR_AUTHOR: string;
+    protected abstract readonly SELECTOR_SUMMARY: string;
+    protected abstract readonly SELECTOR_CHAPTERS: string;
+    protected abstract readonly SELECTOR_FANDOM: string;
+    protected abstract readonly SELECTOR_UPDATED: string;
+
+    protected abstract readonly SELECTOR_URL: string;
+    protected abstract readonly SELECTOR_RATING: string;
 
     constructor(pageHtml: string, db: Database, isVerbose: boolean) {
         this.db = db
@@ -36,6 +47,64 @@ export class Parser {
         this.isVerbose = isVerbose;
     }
 
+    abstract handleFandom(elements: cheerio.Cheerio<Element>): string | null;
+    abstract getAltChaptersReleased(text: string): number
+
+    public getStoryData(work: Element): StoryData {
+        let wElement = this.$(work); 
+    
+        let title = this.formatTitle(this.textBySelector(wElement, this.SELECTOR_TITLE));
+        let author = this.textBySelector(wElement, this.SELECTOR_AUTHOR);
+        let summaries = this.textBySelector(wElement, this.SELECTOR_SUMMARY);
+        let chapters_released = this.textBySelector(wElement, 'dd.chapters > a');
+        let fandom = this.handleFandom(wElement.find(this.SELECTOR_FANDOM));
+        let updated = this.textBySelector(wElement, this.SELECTOR_UPDATED);
+        let wordcount = Number(this.textBySelector(wElement, 'dd.words').replaceAll(",", ""));
+    
+    
+        let chapters_number: number = 0;
+    
+        if (Number.isNaN(Number(chapters_released))) {
+            Logging.warn(Logging.Source.Crawler, `   Failed to get number of chapters in story ${title}, trying alternative...` )
+            chapters_number = this.getAltChaptersReleased(this.$(work).find('dd.chapters').first().text());
+            if (!chapters_number)
+                Logging.error(Logging.Source.Crawler, "  Failure to get number of chapters");
+        }
+    
+        chapters_number = Number(chapters_released)
+    
+        let data: StoryData = this.createStoryData(title!, author, summaries, chapters_number, updated, fandom, wordcount);
+        return data;
+    
+    }
+    
+    public getSourceData($: cheerio.CheerioAPI, work: Element): SourceData {
+        let url = this.$(work).find(this.SELECTOR_URL).attr('href')?.trim();
+        let rating = this.$(work).find(this.SELECTOR_RATING).text().trim().replace(",", "");
+        let updated = this.$(work).find(this.SELECTOR_UPDATED).text().trim();
+    
+        if (Number.isNaN(Number(rating))) {
+            Logging.error(Logging.Source.Parser, '   Rating is NaN');
+        }
+    
+        if (url === undefined) {
+            Logging.error(Logging.Source.Parser, '   Url is undefined')
+        }
+        
+        let data: SourceData = this.createSourceData(url!, Number(rating), updated) // for now i'll do this, but i should do more checking later
+        return data;
+    }
+
+    protected textBySelector(element: cheerio.Cheerio<Element>, selector: string) {
+        return element.find(selector).text().trim()
+    }
+
+    protected formatTitle(title: string) {
+        let formattedTitle = title.replace(/(\()((\w+\\\w+)|\w+|\w+\\)(\))/, "").trim();
+
+        return formattedTitle;
+    }
+    
     
 
     cheerioElementData($: cheerio.CheerioAPI, selector: string, label: string) {

@@ -4,23 +4,23 @@ import * as cheerio from 'cheerio'
 import { Element } from "domhandler";
 import { sleep } from 'bun';
 import * as fetcher from './fetcher.ts'
+import { Database } from 'bun:sqlite'
 
 
 export class ParserAo3 extends crawl.Parser {
 
 public delayMiliseconds: number = 1000 * 10;
 
+protected readonly SELECTOR_WORKS: string;
+protected readonly SELECTOR_TITLE: string;
+protected readonly SELECTOR_AUTHOR: string;
+protected readonly SELECTOR_SUMMARY: string;
+protected readonly SELECTOR_CHAPTERS: string;
+protected readonly SELECTOR_FANDOM: string;
+protected readonly SELECTOR_UPDATED: string;
 
-private static SELECTOR_WORKS = 'li.work';
-private static SELECTOR_TITLE = 'h4.heading > a:first-child';
-private static SELECTOR_AUTHOR = 'h4.heading > a[rel="author"]';
-private static SELECTOR_SUMMARY = 'blockquote.summary';
-private static SELECTOR_CHAPTERS = 'dd.chapters > a';
-private static SELECTOR_FANDOM = 'h5.fandoms > a';
-private static SELECTOR_UPDATED = '.datetime';
-
-private static SELECTOR_URL = 'h4.heading > a:first-child';
-private static SELECTOR_RATING = 'dd.kudos > a';
+protected readonly SELECTOR_URL: string;
+protected readonly SELECTOR_RATING: string;
 
 public static BASE_URL = 'https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works';
 
@@ -30,59 +30,25 @@ private static FANDOM_BLACKLIST = [
     "Original Work"
 ]
 
+constructor(pageHtml: string, db: Database, isVerbose: boolean) {
+    super(pageHtml, db, isVerbose);
+
+    this.SELECTOR_WORKS = 'li.work';
+    this.SELECTOR_TITLE = 'h4.heading > a:first-child';
+    this.SELECTOR_AUTHOR = 'h4.heading > a[rel="author"]';
+    this.SELECTOR_SUMMARY = 'blockquote.summary';
+    this.SELECTOR_CHAPTERS = 'dd.chapters > a';
+    this.SELECTOR_FANDOM = 'h5.fandoms > a';
+    this.SELECTOR_UPDATED = '.datetime';
+
+    this.SELECTOR_URL = 'h4.heading > a:first-child';
+    this.SELECTOR_RATING = 'dd.kudos > a';
+}
+
 // setupCrawling() {
 //     let response: JSON;
 //     this.setupScheduledCrawl(this.delayMiliseconds)
 // }
-
-public textBySelector(element: cheerio.Cheerio<Element>, selector: string) {
-    return element.find(selector).text().trim()
-}
-
-public getStoryData(work: Element): crawl.StoryData {
-    let wElement = this.$(work); 
-
-    let title = this.formatTitle(this.textBySelector(wElement, ParserAo3.SELECTOR_TITLE));
-    let author = this.textBySelector(wElement, ParserAo3.SELECTOR_AUTHOR);
-    let summaries = this.textBySelector(wElement, ParserAo3.SELECTOR_SUMMARY);
-    let chapters_released = this.textBySelector(wElement, 'dd.chapters > a');
-    let fandom = this.handleAo3Fandom(wElement.find(ParserAo3.SELECTOR_FANDOM));
-    let updated = this.textBySelector(wElement, ParserAo3.SELECTOR_UPDATED);
-    let wordcount = Number(this.textBySelector(wElement, 'dd.words').replaceAll(",", ""));
-
-
-    let chapters_number: number = 0;
-
-    if (Number.isNaN(Number(chapters_released))) {
-        Logging.warn(Logging.Source.Crawler, `   Failed to get number of chapters in story ${title}, trying alternative...` )
-        chapters_number = this.getAltChaptersReleased(this.$(work).find('dd.chapters').first().text());
-        if (!chapters_number)
-            Logging.error(Logging.Source.Crawler, "  Failure to get number of chapters");
-    }
-
-    chapters_number = Number(chapters_released)
-
-    let data: crawl.StoryData = this.createStoryData(title!, author, summaries, chapters_number, updated, fandom, wordcount);
-    return data;
-
-}
-
-public getSourceData($: cheerio.CheerioAPI, work: Element): crawl.SourceData {
-    let url = this.$(work).find(ParserAo3.SELECTOR_URL).attr('href')?.trim();
-    let rating = this.$(work).find(ParserAo3.SELECTOR_RATING).text().trim().replace(",", "");
-    let updated = this.$(work).find(ParserAo3.SELECTOR_UPDATED).text().trim();
-
-    if (Number.isNaN(Number(rating))) {
-        Logging.error(Logging.Source.Parser, '   Rating is NaN');
-    }
-
-    if (url === undefined) {
-        Logging.error(Logging.Source.Parser, '   Url is undefined')
-    }
-    
-    let data: crawl.SourceData = this.createSourceData(url!, Number(rating), updated) // for now i'll do this, but i should do more checking later
-    return data;
-}
 
 getAltChaptersReleased(chapters: string): number {
     Logging.info(Logging.Source.Parser, `Trying with ${chapters} `);
@@ -132,7 +98,7 @@ public processPage(): void {
 
 }
 
-handleAo3Fandom(elements: cheerio.Cheerio<Element>): string | null {
+handleFandom(elements: cheerio.Cheerio<Element>): string | null {
     let filteredFandoms = elements.toArray().filter((el) => !ParserAo3.FANDOM_BLACKLIST.includes(this.$(el).text()));
 
     if (filteredFandoms[0] === undefined) {
@@ -175,12 +141,6 @@ getAmountOfPages(): number {
     let pageAmount = Number(pageAmountString);
     Logging.info(Logging.Source.Parser, `Successfuly acquired page amount, string: ${pageAmountString}, number: ${pageAmount}`);
     return pageAmount;
-}
-
-formatTitle(title: string) {
-    let formattedTitle = title.replace(/(\()((\w+\\\w+)|\w+|\w+\\)(\))/, "").trim();
-
-    return formattedTitle;
 }
 
 }
