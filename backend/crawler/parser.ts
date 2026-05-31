@@ -62,17 +62,20 @@ export abstract class Parser {
         let updated = this.textBySelector(wElement, this.SELECTOR_UPDATED);
         let wordcount = Number(this.textBySelector(wElement, this.SELECTOR_WORDS).replaceAll(",", ""));
     
-    
         let chapters_number: number = 0;
     
-        if (Number.isNaN(Number(chapters_released))) {
+        if (Number.isNaN(Number(chapters_released)) || chapters_released.length === 0) {
+
+
             Logging.warn(Logging.Source.Crawler, `   Failed to get number of chapters in story ${title}, trying alternative...` )
-            chapters_number = this.getAltChaptersReleased(this.$(work).find('dd.chapters').first().text());
-            if (!chapters_number)
+            chapters_number = this.getAltChaptersReleased(this.$(work).find('dd.chapters').text());
+            if (!chapters_number || chapters_number == 0)
                 Logging.error(Logging.Source.Crawler, "  Failure to get number of chapters");
         }
+        else {
+            chapters_number = Number(chapters_released)
+        }
     
-        chapters_number = Number(chapters_released)
     
         let data: StoryData = this.createStoryData(title!, author, summaries, chapters_number, updated, fandom, wordcount);
         return data;
