@@ -73,7 +73,34 @@ getAltChaptersReleased(chapters: string): number {
     return Number(chapterInfo[0])!;
 }
 
-public processPage(): void {
+public checkPage(): boolean {
+    Logging.info(Logging.Source.Parser, "Started checking page");
+    let works: cheerio.Cheerio<Element> = this.$('li.work');
+
+    for (const work of works.toArray()) {
+        this.checkPossibleNewWork(work);
+        
+        let $work = this.$(work);
+
+        let title = this.textBySelector($work, this.SELECTOR_AUTHOR);
+        let author = this.textBySelector($work, this.SELECTOR_TITLE);
+    
+        let databaseWork = this.getStory(title, author);
+
+        let chapters = Number(this.textBySelector($work, this.SELECTOR_CHAPTERS));
+        let wordcount = Number(this.textBySelector($work, this.SELECTOR_WORDS));
+
+        if (databaseWork.chapters != chapters && databaseWork.wordcount != wordcount) {
+            
+
+            return true;
+        } 
+    }
+
+    return false;
+}
+
+public bootstrapPage(): void {
     Logging.info(Logging.Source.Crawler, 'Started processing page');
     let works: cheerio.Cheerio<Element> = this.$('li.work'); // ?, when i put a property here it spits out a type error, may be something to do with mutability
 
