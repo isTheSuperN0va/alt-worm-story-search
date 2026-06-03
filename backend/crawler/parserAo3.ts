@@ -81,23 +81,30 @@ public processPage(): void {
         Logging.info(Logging.Source.Crawler, 'Did not get any story in the page');
 
     for (const work of works.toArray()) {
-        Logging.info(Logging.Source.Parser, 'Started parsing story...')
-        
-        let storyData = this.getStoryData(work);
-        let story_id: number | bigint | null = 0;
-
-        if (!(this.doesStoryExist(storyData.title, storyData.author)))
-            story_id = this.insertStoryInDatabase(storyData);
-        else
-            story_id = this.getStoryId(storyData.title, storyData.author);
-        
-        let sourceData = this.getSourceData(this.$, work);
-
-        if (!(this.doesSourceExist(sourceData.url)))
-            this.insertSouceInDatabase(story_id!, sourceData);
+       this.checkPossibleNewWork(work);
+       
+       
+    
     }
     
 
+}
+
+checkPossibleNewWork(work: Element) {
+    Logging.info(Logging.Source.Parser, 'Started parsing story...')
+        
+    let storyData = this.getStoryData(work);
+    let story_id: number | bigint | null = 0;
+
+    if (!(this.doesStoryExist(storyData.title, storyData.author)))
+        story_id = this.insertStoryInDatabase(storyData);
+    else
+        story_id = this.getStoryId(storyData.title, storyData.author);
+    
+    let sourceData = this.getSourceData(this.$, work);
+
+    if (!(this.doesSourceExist(sourceData.url)))
+        this.insertSouceInDatabase(story_id!, sourceData);
 }
 
 handleFandom(elements: cheerio.Cheerio<Element>): string | null {
