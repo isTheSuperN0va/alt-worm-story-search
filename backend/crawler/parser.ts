@@ -25,6 +25,17 @@ export type SourceData = {
     updated: string 
 }
 
+type DatabaseStoryRow = {
+    id: number,
+    title: string,
+    author: string,
+    summary: string,
+    chapters: number,
+    wordcount: number,
+    updated: string,
+    fandom: string
+}
+
 export abstract class Parser {
     protected db: Database;
     protected $: cheerio.CheerioAPI;
@@ -207,12 +218,17 @@ export abstract class Parser {
         return inserted.lastInsertRowid;
     }
 
-    doesStoryExist(title: string, author: string): boolean {
+    getStory(title: string, author: string) {
         const query = this.db.query(`
             SELECT * FROM stories
             WHERE title = ? AND author = ?`);
 
         const row = query.get(title, author);
+        return row as DatabaseStoryRow;
+    }
+
+    doesStoryExist(title: string, author: string): boolean {
+        let row = this.getStory(title, author);
 
         if (row) {
             Logging.info(Logging.Source.Database, '  Story already exists');
