@@ -163,7 +163,7 @@ export abstract class Parser {
         if (this.isVerbose) Logging.info(Logging.Source.Database, `
             Inserting story;
             title: ${data.title};
-            author: ${data.author};
+            author: ${data.author ?? "Anonymous"};
             chapters: ${data.chapters_released};
             wordcount: ${data.wordcount};
             updated: ${data.updated};

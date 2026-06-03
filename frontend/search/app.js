@@ -18,7 +18,7 @@ async function getStories() {
         "Content-Type": "application/json"
     },
     body: JSON.stringify({
-        amount: 50, 
+        amount: 100, 
     })
     });
 
@@ -44,6 +44,7 @@ function addDataToTable(data) {
         let fandom = createTableCell(row.fandom, "fandomData", false);
 
         tableRow.appendChild(updated);
+        tableRow.appendChild(createTableCell(null, "sourceData", true))
         tableRow.appendChild(title);
         tableRow.appendChild(author);
         tableRow.appendChild(chapters);
@@ -59,23 +60,29 @@ function createTableCell(data, className, centered) {
     let cell = document.createElement("td")
     cell.classList.add(className)
 
-    let cellSpan = document.createElement("span");
-    cellSpan.textContent = data;
-    cell.appendChild(cellSpan)
-    if (centered) cellSpan.classList.add("centered")
-    
+    if (data) {
+        let cellSpan = document.createElement("span");
+        cellSpan.textContent = data;
+        cell.appendChild(cellSpan)
+        if (centered) cellSpan.classList.add("centered")
+    }
+
     return cell;
 }
 
 function attachSources(data, imgUrl) {
-    const titleCells = document.getElementsByClassName("titleData")
-
+    const titleCells = document.getElementsByClassName("sourceData")
     const cellsArray = Array.from(titleCells);
 
     let i = 0;
-
+    
     for (const cell of cellsArray) {
-        appendNewLabel(cell, data[i].url, imgUrl)
+
+        const sourceContainer = document.createElement("div");
+        sourceContainer.classList.add('sourceContainer');
+        cell.appendChild(sourceContainer)
+
+        sourceContainer.appendChild(appendNewLabel(data[i].url, imgUrl))
 
         // this should work for when there are more than 1 source for a story
         if (i > 1) {
@@ -92,7 +99,7 @@ function attachSources(data, imgUrl) {
     }
 }
 
-function appendNewLabel(cell, url, imgUrl) {
+function appendNewLabel(url, imgUrl) {
     let aElement = document.createElement("a");
     let imgElement = document.createElement("img");
 
@@ -104,7 +111,8 @@ function appendNewLabel(cell, url, imgUrl) {
     imgElement.setAttribute('title', "AO3");
     
     aElement.appendChild(imgElement)
-    cell.appendChild(aElement)
+
+    return aElement;
 }
 
 function humanDate(datetime) {
@@ -153,12 +161,12 @@ function humanWordcount(wordcount) {
     let wordcountNumber = Number(wordcount);
 
     if (wordcount >= 1000 && wordcount < 1000000) {
-        wordcountNumber = Math.floor(wordcountNumber / 1000);
-        wordcount = String(wordcountNumber) + "k";
+        wordcountNumber = wordcountNumber / 1000;
+        wordcount = wordcountNumber.toFixed(0) + "k";
     }
     if (wordcount >= 1000000) {
-        wordcountNumber = Math.floor(wordcountNumber / 1000000.0);
-        wordcount = String(wordcountNumber) + "m";
+        wordcountNumber = wordcountNumber / 1000000.0;
+        wordcount = wordcountNumber.toFixed(2) + "m";
     }
 
     return wordcount
