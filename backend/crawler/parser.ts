@@ -159,7 +159,28 @@ export abstract class Parser {
         return sourceData;
     }
 
+    checkPossibleNewWork(work: Element, atCreated: boolean) {
+        Logging.info(Logging.Source.Parser, 'Started parsing story...')
+            
+        let storyData = this.getStoryData(work);
+        let story_id: number | bigint | null = 0;
     
+        if (atCreated) storyData.updated = new Date().toDateString();
+    
+        if (!(this.db.doesStoryExist(storyData.title, storyData.author))) {
+            Logging.info(Logging.Source.Database, `Story ${storyData.title} does not exist`);
+            story_id = this.db.insertStoryInDatabase(storyData);
+        }
+        else {
+            Logging.info(Logging.Source.Parser, `Story ${storyData.title} already exists`);
+            story_id = this.db.getStoryId(storyData.title, storyData.author);
+        }
+        
+        let sourceData = this.getSourceData(this.$, work);
+    
+        if (!(this.db.doesSourceExist(sourceData.url)))
+            this.db.insertSouceInDatabase(story_id!, sourceData);
+    }
     
 }
 
