@@ -43,7 +43,39 @@ class ParserForum extends parser.Parser {
     }
 
     handleFandom(elements: cheerio.Cheerio<Element>): string | null {
-        return "placeholder";
+        let titleText = this.$(elements).text();
+
+        let index = titleText.search(/\((\w+|)\)/g);
+        let fandomSlice = titleText.slice(index);
+
+        fandomSlice.replace("(", "");
+        fandomSlice.replace(")", "");
+        fandomSlice.replace("x", "");
+        fandomSlice.replace("X", "");
+
+        let possibleFandoms: string[] = [""];
+        
+        possibleFandoms = fandomSlice.split("\\");
+
+        if (!possibleFandoms || possibleFandoms[0] == undefined) {
+            Logging.error(Logging.Source.Parser, "Something went wrong on parsing forum fandom")
+            return null;
+        }
+
+        if (possibleFandoms[0].length === 0)
+            possibleFandoms = fandomSlice.split(" ");
+
+        if (!possibleFandoms || possibleFandoms[0] == undefined) {
+            Logging.error(Logging.Source.Parser, "Something went wrong on parsing forum fandom")
+            return null;
+        }
+
+        if (possibleFandoms[0].length === 0)
+            return null;
+        
+        possibleFandoms.filter(el => el !== "worm");
+        return possibleFandoms[0];
+
     }
 
     getAltChaptersReleased(text: string): number {
