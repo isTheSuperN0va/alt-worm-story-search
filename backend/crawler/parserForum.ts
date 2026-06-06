@@ -2,6 +2,8 @@ import * as parser from './parser.ts';
 import * as cheerio from 'cheerio'
 import { Element } from "domhandler";
 import { Database } from 'bun:sqlite';
+import * as Logging from "../logger.ts";
+import { wormficDb } from '../database/wormficdb.ts';
 
 const SELECTOR_WORK = '.structItem--story';
 
@@ -18,7 +20,7 @@ class ParserForum extends parser.Parser {
     protected readonly SELECTOR_URL: string;
     protected readonly SELECTOR_RATING: string;
 
-    constructor(pageHtml: string, db: Database, isVerbose: boolean) {
+    constructor(pageHtml: string, db: wormficDb, isVerbose: boolean) {
         super(pageHtml, db, isVerbose);
     
         this.SELECTOR_WORKS = 'div.structItem--story';
@@ -38,7 +40,7 @@ class ParserForum extends parser.Parser {
         let works = this.$(SELECTOR_WORK)
 
         for (const work of works.toArray()) {
-
+            this.checkPossibleNewWork(work, false);
         }
     }
 
@@ -79,7 +81,7 @@ class ParserForum extends parser.Parser {
     }
 
     getAltChaptersReleased(text: string): number {
-        return 0;
+        return Number(text);
     }
 
 
