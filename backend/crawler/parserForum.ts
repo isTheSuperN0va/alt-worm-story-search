@@ -21,17 +21,17 @@ class ParserForum extends parser.Parser {
     constructor(pageHtml: string, db: Database, isVerbose: boolean) {
         super(pageHtml, db, isVerbose);
     
-        this.SELECTOR_WORKS = 'li.work';
-        this.SELECTOR_TITLE = 'h4.heading > a:first-child';
-        this.SELECTOR_AUTHOR = 'h4.heading > a[rel="author"]';
-        this.SELECTOR_SUMMARY = 'blockquote.summary';
-        this.SELECTOR_CHAPTERS = 'dd.chapters > a';
+        this.SELECTOR_WORKS = 'div.structItem--story';
+        this.SELECTOR_TITLE = 'div.structItem--title > a';
+        this.SELECTOR_AUTHOR = 'li > a.username';
+        this.SELECTOR_SUMMARY = 'span.snippet-story-content';
+        this.SELECTOR_CHAPTERS = 'dl.pairs--rows:nth-child(3) > dd';
         this.SELECTOR_FANDOM = 'structItem-tagBlock';
-        this.SELECTOR_UPDATED = '.datetime';
-        this.SELECTOR_WORDS = 'dd.words';
+        this.SELECTOR_UPDATED = 'story-ui--new-threadmarks > time';
+        this.SELECTOR_WORDS = 'dl.pairs--rows:nth-child(1) > dd';
     
-        this.SELECTOR_URL = 'h4.heading > a:first-child';
-        this.SELECTOR_RATING = 'dd.kudos > a';
+        this.SELECTOR_URL = 'div.structItem--title > a';
+        this.SELECTOR_RATING = 'dl.pairs--rows:nth-child(3) > dd';
     }
 
     processPage() {
