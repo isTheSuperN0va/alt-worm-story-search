@@ -94,9 +94,8 @@ public checkPage(): boolean {
         let wordcount = Number(this.textBySelector($work, this.SELECTOR_WORDS).replaceAll(",", ""));
 
         if (databaseWork.chapters != chapters && databaseWork.wordcount != wordcount) {
-            this.db.modifyStory(title, author, chapters, wordcount);
-
             Logging.info(Logging.Source.Parser, "Updated story found");
+            this.db.modifyStory(title, author, chapters, wordcount);
 
             return false;
         } 
@@ -111,7 +110,7 @@ public bootstrapPage(): void {
     let works: cheerio.Cheerio<Element> = this.$('li.work'); // ?, when i put a property here it spits out a type error, may be something to do with mutability
 
     if (!works)
-        Logging.info(Logging.Source.Crawler, 'Did not get any story in the page');
+        Logging.warn(Logging.Source.Crawler, 'Did not get any story in the page');
 
     for (const work of works.toArray()) {
        this.checkPossibleNewWork(work, false);
@@ -191,7 +190,7 @@ static async getAmountOfPages(): Promise<number> {
     }
 
     let pageAmount = Number(pageAmountString);
-    Logging.info(Logging.Source.Parser, `Successfuly acquired page amount, string: ${pageAmountString}, number: ${pageAmount}`);
+    Logging.success(Logging.Source.Parser, `Acquired page amount, string: ${pageAmountString}, number: ${pageAmount}`);
     return pageAmount;
 }
 

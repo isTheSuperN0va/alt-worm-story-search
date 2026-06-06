@@ -69,7 +69,7 @@ export class wormficDb {
             data.updated
         );
 
-        Logging.info(Logging.Source.Database ,'  Success');
+        Logging.success(Logging.Source.Database ,'Inserted source');
         return inserted.lastInsertRowid;
     }
 
@@ -99,11 +99,11 @@ export class wormficDb {
         const row = query.get(url);
 
         if (row) {
-            Logging.info(Logging.Source.Database, '  Source already exists');
+            Logging.info(Logging.Source.Database, 'Source already exists');
             return true;
         }
         else {
-            Logging.info(Logging.Source.Database, '  Source does not exists');
+            Logging.info(Logging.Source.Database, 'Source does not exists');
             return false;
 
         }
@@ -117,7 +117,7 @@ export class wormficDb {
         const row = query.get(title, author) as { id: number | bigint} | null;
 
         if (!row) {
-            Logging.error(Logging.Source.Database, ' Failed to get story_id')
+            Logging.error(Logging.Source.Database, 'Failed to get story_id')
             return null;
         }
 
@@ -133,7 +133,7 @@ export class wormficDb {
         if (modified.changes == 0)
             Logging.error(Logging.Source.Database, "Failed to modify database")
         else 
-            Logging.error(Logging.Source.Database, `Modified story ${title}`)
+            Logging.success(Logging.Source.Database, `Modified story ${title}`)
     }
 
 }

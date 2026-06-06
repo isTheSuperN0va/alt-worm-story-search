@@ -27,6 +27,7 @@ export async function bootstrap(db: wormficDb) {
         await sleep(1000 * 5)
     }
 
+    Logging.success(Logging.Source.Crawler, "Finished bootstrapping")
 }
 
 async function checkPages(db: wormficDb) {
@@ -43,6 +44,8 @@ async function checkPages(db: wormficDb) {
         pagination++;
         await sleep(5000);
     }
+
+    Logging.success(Logging.Source.Crawler, "Reached end of updated stories for this round")
 }
 
 export function setupScheduledCrawler(db: wormficDb, interval: number) {

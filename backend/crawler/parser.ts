@@ -92,11 +92,11 @@ export abstract class Parser {
         let updated = this.$(work).find(this.SELECTOR_UPDATED).text().trim();
     
         if (Number.isNaN(Number(rating))) {
-            Logging.error(Logging.Source.Parser, '   Rating is NaN');
+            Logging.error(Logging.Source.Parser, 'Rating is NaN');
         }
     
         if (url === undefined) {
-            Logging.error(Logging.Source.Parser, '   Url is undefined')
+            Logging.error(Logging.Source.Parser, 'Url is undefined')
         }
         
         let data: SourceData = this.createSourceData(url!, Number(rating), updated) // for now i'll do this, but i should do more checking later
@@ -141,7 +141,7 @@ export abstract class Parser {
             wordcount: wordcount
         }
 
-        Logging.info(Logging.Source.Parser, `    Created StoryData for ${storyData.title}`);
+        Logging.success(Logging.Source.Parser, `Created StoryData for ${storyData.title}`);
 
         return storyData;
     }
@@ -155,7 +155,7 @@ export abstract class Parser {
             updated: updated
         }
 
-        Logging.info(Logging.Source.Parser, `    Created SourceData for ${sourceData.url}`);
+        Logging.success(Logging.Source.Parser, `Created SourceData for ${sourceData.url}`);
         return sourceData;
     }
 
