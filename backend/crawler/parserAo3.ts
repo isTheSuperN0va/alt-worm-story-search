@@ -5,6 +5,7 @@ import { Element } from "domhandler";
 import { sleep } from 'bun';
 import * as fetcher from './fetcher.ts'
 import { Database } from 'bun:sqlite'
+import { wormficDb } from '../database/wormficdb.ts';
 
 
 export class ParserAo3 extends crawl.Parser {
@@ -31,7 +32,7 @@ private static FANDOM_BLACKLIST = [
     "Original Work"
 ]
 
-constructor(pageHtml: string, db: Database, isVerbose: boolean) {
+constructor(pageHtml: string, db: wormficDb, isVerbose: boolean) {
     super(pageHtml, db, isVerbose);
 
     this.SELECTOR_WORKS = 'li.work';
@@ -82,7 +83,7 @@ public checkPage(): boolean {
         let author = this.textBySelector($work, this.SELECTOR_AUTHOR);
     
         Logging.info(Logging.Source.Parser, `Trying to get story info of ${title}`)
-        let databaseWork = this.getStory(title, author);
+        let databaseWork = this.db.getStory(title, author);
 
         if (!databaseWork) {
             Logging.error(Logging.Source.Parser, "Failed to get database info on story")
@@ -93,7 +94,7 @@ public checkPage(): boolean {
         let wordcount = Number(this.textBySelector($work, this.SELECTOR_WORDS).replaceAll(",", ""));
 
         if (databaseWork.chapters != chapters && databaseWork.wordcount != wordcount) {
-            this.modifyStory(title, author, chapters, wordcount);
+            this.db.modifyStory(title, author, chapters, wordcount);
 
             Logging.info(Logging.Source.Parser, "Updated story found");
 
@@ -130,19 +131,19 @@ checkPossibleNewWork(work: Element, atCreated: boolean) {
 
     if (atCreated) storyData.updated = new Date().toDateString();
 
-    if (!(this.doesStoryExist(storyData.title, storyData.author))) {
+    if (!(this.db.doesStoryExist(storyData.title, storyData.author))) {
         Logging.info(Logging.Source.Database, `Story ${storyData.title} does not exist`);
-        story_id = this.insertStoryInDatabase(storyData);
+        story_id = this.db.insertStoryInDatabase(storyData);
     }
     else {
         Logging.info(Logging.Source.Parser, `Story ${storyData.title} already exists`);
-        story_id = this.getStoryId(storyData.title, storyData.author);
+        story_id = this.db.getStoryId(storyData.title, storyData.author);
     }
     
     let sourceData = this.getSourceData(this.$, work);
 
-    if (!(this.doesSourceExist(sourceData.url)))
-        this.insertSouceInDatabase(story_id!, sourceData);
+    if (!(this.db.doesSourceExist(sourceData.url)))
+        this.db.insertSouceInDatabase(story_id!, sourceData);
 }
 
 handleFandom(elements: cheerio.Cheerio<Element>): string | null {

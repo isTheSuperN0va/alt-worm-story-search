@@ -1,8 +1,9 @@
 import { Database } from "bun:sqlite";
 import * as cAo3 from "./crawler/parserAo3.ts"
 import * as crawler from './crawler/crawler.ts';
+import { wormficDb } from "./database/wormficdb.ts";
 
-const db = new Database("./database/wormindex.db");
+const db = new wormficDb();
 const portNumber = 3000;
 
 type StoriesRequest = {
@@ -54,12 +55,14 @@ Bun.serve({
             case "/api/stories":
                 const data = await req.json() as StoriesRequest;
                 
-                const query = db.query(`
+                const query = db.connection.query(`
                     SELECT *
                     FROM stories
                     INNER JOIN sources
                     ON stories.id = sources.story_id
-                    LIMIT ?`);
+                    ORDER BY updated DESC
+                    LIMIT ?;
+                    `);
                 const stories = query.all(data.amount);
                 return Response.json(stories);
             case "/source/ao3":

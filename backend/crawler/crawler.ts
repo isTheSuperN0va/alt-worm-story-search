@@ -3,9 +3,10 @@ import * as parser from './parserAo3';
 import { Database } from "bun:sqlite";
 import * as Logging from '../logger';
 import { sleep } from 'bun';
+import type { wormficDb } from '../database/wormficdb';
 
 
-export async function bootstrap(db: Database) {
+export async function bootstrap(db: wormficDb) {
     let ao3Fetcher = new fetcher.fetcher(fetcher.BaseURL.AO3);
     await ao3Fetcher.fetchSite("");
     let ao3Parser = new parser.ParserAo3(ao3Fetcher.dataCurrent, db, false);
@@ -28,7 +29,7 @@ export async function bootstrap(db: Database) {
 
 }
 
-async function checkPages(db: Database) {
+async function checkPages(db: wormficDb) {
     let notReachedEnd: boolean = true;
 
     let ao3Fetcher = new fetcher.fetcher(fetcher.BaseURL.AO3);
@@ -44,7 +45,7 @@ async function checkPages(db: Database) {
     }
 }
 
-export function setupScheduledCrawler(db: Database, interval: number) {
+export function setupScheduledCrawler(db: wormficDb, interval: number) {
     setInterval(() => checkPages(db), interval);
 }
 
