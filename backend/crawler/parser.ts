@@ -3,6 +3,7 @@ import { Element } from "domhandler";
 import { Database } from 'bun:sqlite'
 import * as Logging from '../logger'
 import { BaseURL } from './fetcher';
+import { canHaveModifiers } from 'typescript';
 
 const ao3Url: string = "https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works";
 
@@ -192,7 +193,7 @@ export abstract class Parser {
             data.fandom,
         );
 
-        Logging.info(Logging.Source.Database, "  Success");
+        Logging.info(Logging.Source.Database, "Inserted story");
         return inserted.lastInsertRowid;
     }
 
@@ -232,11 +233,8 @@ export abstract class Parser {
 
         if (row)
             return true;
-        }
-        else {
-            Logging.info(Logging.Source.Database, '  New story found')
+        else 
             return false;
-        }
     }
 
     doesSourceExist(url: string): boolean {

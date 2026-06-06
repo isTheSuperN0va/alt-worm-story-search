@@ -47,10 +47,6 @@ constructor(pageHtml: string, db: Database, isVerbose: boolean) {
     this.SELECTOR_RATING = 'dd.kudos > a';
 }
 
-// setupCrawling() {
-//     let response: JSON;
-//     this.setupScheduledCrawl(this.delayMiliseconds)
-// }
 
 getAltChaptersReleased(chapters: string): number {
     Logging.info(Logging.Source.Parser, `Trying with ${chapters} `);
@@ -117,7 +113,7 @@ public bootstrapPage(): void {
         Logging.info(Logging.Source.Crawler, 'Did not get any story in the page');
 
     for (const work of works.toArray()) {
-       this.checkPossibleNewWork(work);
+       this.checkPossibleNewWork(work, false);
        
        
     
@@ -126,7 +122,7 @@ public bootstrapPage(): void {
 
 }
 
-checkPossibleNewWork(work: Element) {
+checkPossibleNewWork(work: Element, atCreated: boolean) {
     Logging.info(Logging.Source.Parser, 'Started parsing story...')
         
     let storyData = this.getStoryData(work);

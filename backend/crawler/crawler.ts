@@ -9,7 +9,7 @@ export async function bootstrap(db: Database) {
     let ao3Fetcher = new fetcher.fetcher(fetcher.BaseURL.AO3);
     await ao3Fetcher.fetchSite("");
     let ao3Parser = new parser.ParserAo3(ao3Fetcher.dataCurrent, db, false);
-    let pageAmount: number = ao3Parser.getAmountOfPages();
+    let pageAmount: number = await parser.ParserAo3.getAmountOfPages();
 
     if (pageAmount === 0) return;
 
@@ -19,7 +19,7 @@ export async function bootstrap(db: Database) {
     for (let i = 2; i <= pageAmount; i++) {
         ao3Fetcher.fetchSite(`?page=${i}`);
         ao3Parser = new parser.ParserAo3(ao3Fetcher.dataCurrent, db, true);
-        ao3Parser.processPage()
+        ao3Parser.bootstrapPage()
 
         percentageComplete = i / pageAmount;
         Logging.info(Logging.Source.Crawler, `Completed page, status: ${Number(percentageComplete.toPrecision(2)) * 100}% (${i}/${pageAmount})`);
