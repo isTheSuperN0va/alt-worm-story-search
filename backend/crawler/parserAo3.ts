@@ -180,9 +180,13 @@ formatAo3Fandom(fandom: string) {
     return formattedFandom[0]!;
 }
 
-getAmountOfPages(): number {
-    let pageAmountString = this.$('ol.pagination > li:nth-last-child(2)').first().text();
-    console.log(this.$('ol.pagination > li:nth-last-child(2) > a:first-child').text());
+static async getAmountOfPages(): Promise<number> {
+    let fetcherAo3 = new fetcher.fetcher(fetcher.BaseURL.AO3);
+    await fetcherAo3.fetchSite();
+    let $ = cheerio.load(fetcherAo3.dataCurrent);
+
+    let pageAmountString = $('ol.pagination > li:nth-last-child(2)').first().text();
+    console.log($('ol.pagination > li:nth-last-child(2) > a:first-child').text());
 
     if (Number.isNaN(pageAmountString)) {
         Logging.error(Logging.Source.Parser, 'Failed to get a coherent page amount for bootstraping');
