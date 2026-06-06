@@ -230,8 +230,7 @@ export abstract class Parser {
     doesStoryExist(title: string, author: string): boolean {
         let row = this.getStory(title, author);
 
-        if (row) {
-            Logging.info(Logging.Source.Database, '  Story already exists');
+        if (row)
             return true;
         }
         else {

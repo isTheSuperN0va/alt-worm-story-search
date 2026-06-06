@@ -11,9 +11,6 @@ export class fetcher {
     constructor(baseUrl: string) {
         this.baseUrl = baseUrl;
     }
-
-    private setupScheduledCrawl(delayMiliseconds: number): void { 
-            setInterval(() => this.fetchSite(), delayMiliseconds) }
     
     async fetchSite(suffix?: string): Promise<void> {
             const res = await fetch (this.baseUrl + suffix);

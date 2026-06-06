@@ -78,7 +78,7 @@ public checkPage(): boolean {
     let works: cheerio.Cheerio<Element> = this.$('li.work');
 
     for (const work of works.toArray()) {
-        this.checkPossibleNewWork(work);
+        this.checkPossibleNewWork(work, true);
         
         let $work = this.$(work);
 
@@ -123,10 +123,16 @@ checkPossibleNewWork(work: Element) {
     let storyData = this.getStoryData(work);
     let story_id: number | bigint | null = 0;
 
-    if (!(this.doesStoryExist(storyData.title, storyData.author)))
+    if (atCreated) storyData.updated = new Date().toDateString();
+
+    if (!(this.doesStoryExist(storyData.title, storyData.author))) {
+        Logging.info(Logging.Source.Database, `Story ${storyData.title} does not exist`);
         story_id = this.insertStoryInDatabase(storyData);
-    else
+    }
+    else {
+        Logging.info(Logging.Source.Parser, `Story ${storyData.title} already exists`);
         story_id = this.getStoryId(storyData.title, storyData.author);
+    }
     
     let sourceData = this.getSourceData(this.$, work);
 
