@@ -28,6 +28,26 @@ export async function bootstrap(db: Database) {
 
 }
 
+async function checkPages(db: Database) {
+    let notReachedEnd: boolean = true;
+
+    let ao3Fetcher = new fetcher.fetcher(fetcher.BaseURL.AO3);
+    let examplePageHTML = await ao3Fetcher.fetchSite();
+
+    let pagination: number = 1;
+    while (notReachedEnd) {
+        ao3Fetcher.fetchSite(`?page=${pagination}`)
+        let parserAo3 = new parser.ParserAo3(ao3Fetcher.dataCurrent, db, false);
+        notReachedEnd = parserAo3.checkPage();
+        pagination++;
+        await sleep(5000);
+    }
+}
+
+export function setupScheduledCrawler(db: Database, interval: number) {
+    setInterval(() => checkPages(db), interval);
+}
+
 //TODO
 // *Remover parenteses em autor, titulos ok
 // *Remover '|' das fandoms (priorizar direita) ok
