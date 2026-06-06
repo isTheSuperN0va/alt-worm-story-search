@@ -82,22 +82,31 @@ public checkPage(): boolean {
         
         let $work = this.$(work);
 
-        let title = this.textBySelector($work, this.SELECTOR_AUTHOR);
-        let author = this.textBySelector($work, this.SELECTOR_TITLE);
+        let title = this.textBySelector($work, this.SELECTOR_TITLE);
+        let author = this.textBySelector($work, this.SELECTOR_AUTHOR);
     
+        Logging.info(Logging.Source.Parser, `Trying to get story info of ${title}`)
         let databaseWork = this.getStory(title, author);
 
+        if (!databaseWork) {
+            Logging.error(Logging.Source.Parser, "Failed to get database info on story")
+            return true;
+        }
+
         let chapters = Number(this.textBySelector($work, this.SELECTOR_CHAPTERS));
-        let wordcount = Number(this.textBySelector($work, this.SELECTOR_WORDS));
+        let wordcount = Number(this.textBySelector($work, this.SELECTOR_WORDS).replaceAll(",", ""));
 
         if (databaseWork.chapters != chapters && databaseWork.wordcount != wordcount) {
-            
+            this.modifyStory(title, author, chapters, wordcount);
 
-            return true;
+            Logging.info(Logging.Source.Parser, "Updated story found");
+
+            return false;
         } 
     }
 
-    return false;
+    return true;
+
 }
 
 public bootstrapPage(): void {
