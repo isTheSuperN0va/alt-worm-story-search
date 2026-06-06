@@ -273,6 +273,18 @@ export abstract class Parser {
         return row.id;
     }
 
+    public modifyStory(title: string, author: string, chapters: number, wordcount: number) {        
+        let modify = this.db.prepare(`UPDATE stories
+            SET chapters = ?, wordcount = ?
+            WHERE title = ? AND author = ?`);
+
+        let modified = modify.run(chapters, wordcount, title, author);
+        if (modified.changes == 0)
+            Logging.error(Logging.Source.Database, "Failed to modify database")
+        else 
+            Logging.error(Logging.Source.Database, `Modified story ${title}`)
+    }
+
     
 }
 
