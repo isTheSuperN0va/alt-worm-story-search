@@ -2,6 +2,7 @@ import * as Logging from '../logger';
 
 export enum BaseURL {
     AO3 = "https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works",
+    SB = "https://forums.spacebattles.com/forums/worm.115/"
 }
 
 export class fetcher {

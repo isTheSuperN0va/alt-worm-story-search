@@ -7,7 +7,7 @@ import { wormficDb } from '../database/wormficdb.ts';
 
 const SELECTOR_WORK = '.structItem--story';
 
-class ParserForum extends parser.Parser {
+export class ParserForum extends parser.Parser {
     protected readonly SELECTOR_WORKS: string;
     protected readonly SELECTOR_TITLE: string;
     protected readonly SELECTOR_AUTHOR: string;
@@ -34,9 +34,10 @@ class ParserForum extends parser.Parser {
     
         this.SELECTOR_URL = 'div.structItem--title > a';
         this.SELECTOR_RATING = 'dl.pairs--rows:nth-child(3) > dd';
+        parser.Parser.SELECTOR_PAGES = 'ul.pageNav-main > li:nth-lastchild(1)';
     }
 
-    processPage() {
+    bootstrapPage() {
         let works = this.$(SELECTOR_WORK)
 
         for (const work of works.toArray()) {
@@ -83,6 +84,5 @@ class ParserForum extends parser.Parser {
     getAltChaptersReleased(text: string): number {
         return Number(text);
     }
-
 
 }

@@ -24,6 +24,7 @@ protected readonly SELECTOR_WORDS: string;
 protected readonly SELECTOR_URL: string;
 protected readonly SELECTOR_RATING: string;
 
+
 public static BASE_URL = 'https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works';
 
 private static FANDOM_BLACKLIST = [
@@ -46,6 +47,7 @@ constructor(pageHtml: string, db: wormficDb, isVerbose: boolean) {
 
     this.SELECTOR_URL = 'h4.heading > a:first-child';
     this.SELECTOR_RATING = 'dd.kudos > a';
+    crawl.Parser.SELECTOR_PAGES = 'ol.pagination > li:nth-last-child(2)';
 }
 
 
@@ -153,23 +155,6 @@ formatAo3Fandom(fandom: string) {
     return formattedFandom[0]!;
 }
 
-static async getAmountOfPages(): Promise<number> {
-    let fetcherAo3 = new fetcher.fetcher(fetcher.BaseURL.AO3);
-    await fetcherAo3.fetchSite();
-    let $ = cheerio.load(fetcherAo3.dataCurrent);
-
-    let pageAmountString = $('ol.pagination > li:nth-last-child(2)').first().text();
-    console.log($('ol.pagination > li:nth-last-child(2) > a:first-child').text());
-
-    if (Number.isNaN(pageAmountString)) {
-        Logging.error(Logging.Source.Parser, 'Failed to get a coherent page amount for bootstraping');
-        return 0;
-    }
-
-    let pageAmount = Number(pageAmountString);
-    Logging.success(Logging.Source.Parser, `Acquired page amount, string: ${pageAmountString}, number: ${pageAmount}`);
-    return pageAmount;
-}
 
 }
 

@@ -5,6 +5,7 @@ import * as Logging from '../logger'
 import { BaseURL } from './fetcher';
 import { canHaveModifiers } from 'typescript';
 import { wormficDb } from '../database/wormficdb';
+import * as fetcher from './fetcher'
 
 const ao3Url: string = "https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works";
 
@@ -45,6 +46,7 @@ export abstract class Parser {
 
     protected abstract readonly SELECTOR_URL: string;
     protected abstract readonly SELECTOR_RATING: string;
+    protected static SELECTOR_PAGES: string;
 
     constructor(pageHtml: string, db: wormficDb, isVerbose: boolean) {
         this.db = db
@@ -180,6 +182,24 @@ export abstract class Parser {
     
         if (!(this.db.doesSourceExist(sourceData.url)))
             this.db.insertSouceInDatabase(story_id!, sourceData);
+    }
+
+
+    static async getAmountOfPages(url: BaseURL): Promise<number> {
+        let fetcherAo3 = new fetcher.fetcher(url);
+        await fetcherAo3.fetchSite();
+        let $ = cheerio.load(fetcherAo3.dataCurrent);
+
+        let pageAmountString = $(Parser.SELECTOR_PAGES).first().text();
+
+        if (Number.isNaN(pageAmountString)) {
+            Logging.error(Logging.Source.Parser, 'Failed to get a coherent page amount for bootstraping');
+            return 0;
+        }
+
+        let pageAmount = Number(pageAmountString);
+        Logging.success(Logging.Source.Parser, `Acquired page amount, string: ${pageAmountString}, number: ${pageAmount}`);
+        return pageAmount;
     }
     
 }
