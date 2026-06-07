@@ -21,7 +21,7 @@ export class ParserForum extends parser.Parser {
     constructor(pageHtml: string, db: wormficDb, isVerbose: boolean) {
         super(pageHtml, db, isVerbose);
     
-        this.SELECTOR_WORKS = 'div.structItem--story';
+        this.SELECTOR_WORKS = 'div.structItem--thread';
         this.SELECTOR_TITLE = 'div.structItem--title > a';
         this.SELECTOR_AUTHOR = 'li > a.username';
         this.SELECTOR_SUMMARY = 'span.snippet-story-content';
@@ -36,8 +36,7 @@ export class ParserForum extends parser.Parser {
     }
 
     bootstrapPage() {
-        let works: cheerio.Cheerio<Element> = this.$('div.structItem--story');
-        console.log(works.toArray());
+        let works: cheerio.Cheerio<Element> = this.$('div.structItem--thread');
 
         for (const work of works.toArray()) {
             this.checkPossibleNewWork(work, false);

@@ -10,12 +10,17 @@ async function fetchWithPlaywright(url: string): Promise<string> {
     let headlessBrowser = await chromium.launch();
     let page = await headlessBrowser.newPage();
 
-    page.goto(url, { waitUntil: 'networkidle'});
+    await page.goto(url, {
+        waitUntil: 'load',
+        timeout: 60000,
+    });
 
+    let html = await page.content();
     await page.close();
     await headlessBrowser.close();
 
-    return page.content();
+
+    return html;
 }
 
 export class fetcher {
@@ -36,7 +41,7 @@ export class fetcher {
             else {
                 this.dataCurrent = await fetchWithPlaywright(fullUrl)
             }
-            
+
             Logging.info(Logging.Source.Http, "Fetched AO3 page")
     }
 }
