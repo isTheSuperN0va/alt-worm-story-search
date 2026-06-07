@@ -16,7 +16,7 @@ export async function bootstrap(db: wormficDb) {
     let ao3Fetcher = new fetcher.fetcher(fetcher.BaseURL.AO3);
     let SBFetcher = new fetcher.fetcher(fetcher.BaseURL.SB);
 
-    await ao3Fetcher.fetchSite("");
+    await ao3Fetcher.fetchSite(false);
     let pageAmountAo3: number = await parserAo3.ParserAo3.getAmountOfPages(Bootstrap.AO3, fetcher.BaseURL.AO3);
     let pageAmountSB: number = await parserForum.ParserForum.getAmountOfPages(Bootstrap.SB, fetcher.BaseURL.SB);
 
@@ -41,7 +41,7 @@ async function bootstrapSite(boot: Bootstrap, fetcher: fetcher.fetcher, pageAmou
                 // ao3Parser.bootstrapPage()
             break;
             case Bootstrap.SB:
-                await fetcher.fetchSite(`page-${2}`);
+                await fetcher.fetchSite(true, `page-${2}`);
                 let SBParser = new parserForum.ParserForum(fetcher.dataCurrent, db, true);
                 SBParser.bootstrapPage()
             break;
@@ -59,11 +59,10 @@ async function checkPages(db: wormficDb) {
     let notReachedEnd: boolean = true;
 
     let ao3Fetcher = new fetcher.fetcher(fetcher.BaseURL.AO3);
-    let examplePageHTML = await ao3Fetcher.fetchSite();
 
     let pagination: number = 1;
     while (notReachedEnd) {
-        ao3Fetcher.fetchSite(`?page=${pagination}`)
+        ao3Fetcher.fetchSite(false, `?page=${pagination}`)
         let IparserAo3 = new parserAo3.ParserAo3(ao3Fetcher.dataCurrent, db, false);
         notReachedEnd = IparserAo3.checkPage();
         pagination++;

@@ -188,7 +188,7 @@ export abstract class Parser {
 
     static async getAmountOfPages(where: Bootstrap, url: BaseURL): Promise<number> {
         let fetcherAo3 = new fetcher.fetcher(url);
-        await fetcherAo3.fetchSite("");
+        await fetcherAo3.fetchSite(false);
         let $ = cheerio.load(fetcherAo3.dataCurrent);
 
         let pageAmountString = $(Parser.SELECTOR_PAGES).first().text();
