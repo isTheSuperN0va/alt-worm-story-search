@@ -1,33 +1,57 @@
 import * as fetcher from './fetcher';
-import * as parser from './parserAo3';
+import * as parserAo3 from './parserAo3';
 import { Database } from "bun:sqlite";
 import * as Logging from '../logger';
 import { sleep } from 'bun';
 import type { wormficDb } from '../database/wormficdb';
+import * as parser from './parser.ts'
+import * as parserForum from './parserForum.ts';
 
+enum Bootstrap {
+    AO3,
+    SB,
+}
 
 export async function bootstrap(db: wormficDb) {
     let ao3Fetcher = new fetcher.fetcher(fetcher.BaseURL.AO3);
-    await ao3Fetcher.fetchSite("");
-    let ao3Parser = new parser.ParserAo3(ao3Fetcher.dataCurrent, db, false);
-    let pageAmount: number = await parser.ParserAo3.getAmountOfPages();
+    let SBFetcher = new fetcher.fetcher(fetcher.BaseURL.SB);
 
-    if (pageAmount === 0) return;
+    await ao3Fetcher.fetchSite("");
+    let pageAmountAo3: number = await parserAo3.ParserAo3.getAmountOfPages(fetcher.BaseURL.AO3);
+    let pageAmountSB: number = await parserForum.ParserForum.getAmountOfPages(fetcher.BaseURL.SB);
 
     Logging.info(Logging.Source.Crawler, 'Initializing bootstrapper')
+
+    bootstrapSite(Bootstrap.AO3, ao3Fetcher, pageAmountAo3, db);
+    bootstrapSite(Bootstrap.SB, ao3Fetcher, pageAmountAo3, db);
+
+
+    Logging.success(Logging.Source.Crawler, "Finished bootstrapping")
+}
+
+async function bootstrapSite(boot: Bootstrap, fetcher: fetcher.fetcher, pageAmount: number, db: wormficDb) {
     let percentageComplete: number = 0 / pageAmount;
 
     for (let i = 2; i <= pageAmount; i++) {
-        ao3Fetcher.fetchSite(`?page=${i}`);
-        ao3Parser = new parser.ParserAo3(ao3Fetcher.dataCurrent, db, true);
-        ao3Parser.bootstrapPage()
+        fetcher.fetchSite(`?page=${i}`);
+
+        switch (boot) {
+            case Bootstrap.AO3:
+                let ao3Parser = new parserAo3.ParserAo3(fetcher.dataCurrent, db, true);
+                ao3Parser.bootstrapPage()
+            break;
+            case Bootstrap.SB:
+                let SBParser = new parserForum.ParserForum(fetcher.dataCurrent, db, true);
+                SBParser.bootstrapPage()
+            break;
+
+        }
 
         percentageComplete = i / pageAmount;
         Logging.info(Logging.Source.Crawler, `Completed page, status: ${Number(percentageComplete.toPrecision(2)) * 100}% (${i}/${pageAmount})`);
         await sleep(1000 * 5)
     }
 
-    Logging.success(Logging.Source.Crawler, "Finished bootstrapping")
 }
 
 async function checkPages(db: wormficDb) {
@@ -39,8 +63,8 @@ async function checkPages(db: wormficDb) {
     let pagination: number = 1;
     while (notReachedEnd) {
         ao3Fetcher.fetchSite(`?page=${pagination}`)
-        let parserAo3 = new parser.ParserAo3(ao3Fetcher.dataCurrent, db, false);
-        notReachedEnd = parserAo3.checkPage();
+        let IparserAo3 = new parserAo3.ParserAo3(ao3Fetcher.dataCurrent, db, false);
+        notReachedEnd = IparserAo3.checkPage();
         pagination++;
         await sleep(5000);
     }
