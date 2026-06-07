@@ -7,7 +7,7 @@ import type { wormficDb } from '../database/wormficdb';
 import * as parser from './parser.ts'
 import * as parserForum from './parserForum.ts';
 
-enum Bootstrap {
+export enum Bootstrap {
     AO3,
     SB,
 }
@@ -17,13 +17,13 @@ export async function bootstrap(db: wormficDb) {
     let SBFetcher = new fetcher.fetcher(fetcher.BaseURL.SB);
 
     await ao3Fetcher.fetchSite("");
-    let pageAmountAo3: number = await parserAo3.ParserAo3.getAmountOfPages(fetcher.BaseURL.AO3);
-    let pageAmountSB: number = await parserForum.ParserForum.getAmountOfPages(fetcher.BaseURL.SB);
+    let pageAmountAo3: number = await parserAo3.ParserAo3.getAmountOfPages(Bootstrap.AO3, fetcher.BaseURL.AO3);
+    let pageAmountSB: number = await parserForum.ParserForum.getAmountOfPages(Bootstrap.SB, fetcher.BaseURL.SB);
 
     Logging.info(Logging.Source.Crawler, 'Initializing bootstrapper')
 
     bootstrapSite(Bootstrap.AO3, ao3Fetcher, pageAmountAo3, db);
-    bootstrapSite(Bootstrap.SB, ao3Fetcher, pageAmountAo3, db);
+    bootstrapSite(Bootstrap.SB, SBFetcher, pageAmountSB, db);
 
 
     Logging.success(Logging.Source.Crawler, "Finished bootstrapping")
@@ -33,14 +33,15 @@ async function bootstrapSite(boot: Bootstrap, fetcher: fetcher.fetcher, pageAmou
     let percentageComplete: number = 0 / pageAmount;
 
     for (let i = 2; i <= pageAmount; i++) {
-        fetcher.fetchSite(`?page=${i}`);
-
         switch (boot) {
             case Bootstrap.AO3:
-                let ao3Parser = new parserAo3.ParserAo3(fetcher.dataCurrent, db, true);
-                ao3Parser.bootstrapPage()
+                return
+                // await fetcher.fetchSite(`?page=${i}`);
+                // let ao3Parser = new parserAo3.ParserAo3(fetcher.dataCurrent, db, true);
+                // ao3Parser.bootstrapPage()
             break;
             case Bootstrap.SB:
+                await fetcher.fetchSite(`page-${2}`);
                 let SBParser = new parserForum.ParserForum(fetcher.dataCurrent, db, true);
                 SBParser.bootstrapPage()
             break;

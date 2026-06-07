@@ -18,7 +18,7 @@ export class wormficDb {
     connection: Database;
 
     constructor() {
-        this.connection = new Database("./wormindex.db");
+        this.connection = new Database("./database/wormindex.db");
     }
 
     insertStoryInDatabase(data: StoryData): number | bigint {

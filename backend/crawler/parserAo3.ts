@@ -47,7 +47,7 @@ constructor(pageHtml: string, db: wormficDb, isVerbose: boolean) {
 
     this.SELECTOR_URL = 'h4.heading > a:first-child';
     this.SELECTOR_RATING = 'dd.kudos > a';
-    crawl.Parser.SELECTOR_PAGES = 'ol.pagination > li:nth-last-child(2)';
+    ParserAo3.SELECTOR_PAGES = 'ol.pagination > li:nth-last-child(2)';
 }
 
 

@@ -6,6 +6,7 @@ import { BaseURL } from './fetcher';
 import { canHaveModifiers } from 'typescript';
 import { wormficDb } from '../database/wormficdb';
 import * as fetcher from './fetcher'
+import { Bootstrap } from './crawler';
 
 const ao3Url: string = "https://archiveofourown.org/tags/Parahumans%20Series%20-%20Wildbow/works";
 
@@ -185,12 +186,17 @@ export abstract class Parser {
     }
 
 
-    static async getAmountOfPages(url: BaseURL): Promise<number> {
+    static async getAmountOfPages(where: Bootstrap, url: BaseURL): Promise<number> {
         let fetcherAo3 = new fetcher.fetcher(url);
-        await fetcherAo3.fetchSite();
+        await fetcherAo3.fetchSite("");
         let $ = cheerio.load(fetcherAo3.dataCurrent);
 
         let pageAmountString = $(Parser.SELECTOR_PAGES).first().text();
+
+        if (where == Bootstrap.AO3) pageAmountString = $('ol.pagination > li:nth-last-child(2)').first().text();
+        if (where == Bootstrap.SB) pageAmountString = $('ul.pageNav-main > li:nth-last-child(1)').first().text(); 
+
+        
 
         if (Number.isNaN(pageAmountString)) {
             Logging.error(Logging.Source.Parser, 'Failed to get a coherent page amount for bootstraping');

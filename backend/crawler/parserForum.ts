@@ -5,8 +5,6 @@ import { Database } from 'bun:sqlite';
 import * as Logging from "../logger.ts";
 import { wormficDb } from '../database/wormficdb.ts';
 
-const SELECTOR_WORK = '.structItem--story';
-
 export class ParserForum extends parser.Parser {
     protected readonly SELECTOR_WORKS: string;
     protected readonly SELECTOR_TITLE: string;
@@ -34,11 +32,12 @@ export class ParserForum extends parser.Parser {
     
         this.SELECTOR_URL = 'div.structItem--title > a';
         this.SELECTOR_RATING = 'dl.pairs--rows:nth-child(3) > dd';
-        parser.Parser.SELECTOR_PAGES = 'ul.pageNav-main > li:nth-lastchild(1)';
+        ParserForum.SELECTOR_PAGES = 'ul.pageNav-main > li:nth-lastchild(1)';
     }
 
     bootstrapPage() {
-        let works = this.$(SELECTOR_WORK)
+        let works: cheerio.Cheerio<Element> = this.$('div.structItem--story');
+        console.log(works.toArray());
 
         for (const work of works.toArray()) {
             this.checkPossibleNewWork(work, false);
